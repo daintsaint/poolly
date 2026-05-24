@@ -1,0 +1,30 @@
+# Rust / Anchor
+target/
+.anchor/
+**/*.rs.bk
+test-ledger/
+
+# Node
+node_modules/
+.next/
+.turbo/
+dist/
+out/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Keys — never commit keypairs
+**/*-keypair.json
+**/*-kp.json
+~/.config/solana/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/

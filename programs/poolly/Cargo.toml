@@ -1,0 +1,20 @@
+[package]
+name = "poolly"
+version = "0.1.0"
+description = "Poolly group-buying escrow program"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "poolly"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
+anchor-spl = { version = "0.31.1", features = ["token", "associated_token"] }

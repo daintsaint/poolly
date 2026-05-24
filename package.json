@@ -1,0 +1,11 @@
+{
+  "name": "poolly",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["app"],
+  "scripts": {
+    "dev": "cd app && npm run dev",
+    "build": "cd app && npm run build",
+    "test": "anchor test"
+  }
+}
