@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   webpack: (config) => {
     // Required for @solana/web3.js in Next.js
     config.resolve.fallback = {
