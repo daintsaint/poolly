@@ -1,14 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useRef, useState } from "react";
-
-const WalletMultiButton = dynamic(
-  () => import("@solana/wallet-adapter-react-ui").then((m) => m.WalletMultiButton),
-  { ssr: false }
-);
 
 /* ─────────────────────────────────────────────────────────
    ServiceMark
@@ -220,13 +214,130 @@ export function BTicker() {
 }
 
 /* ─────────────────────────────────────────────────────────
+   WalletButton — custom, no WalletMultiButton dependency
+───────────────────────────────────────────────────────── */
+function WalletButton() {
+  const { wallets, select, connect, disconnect, connecting, connected, publicKey } = useWallet();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const short = publicKey
+    ? `${publicKey.toBase58().slice(0, 4)}…${publicKey.toBase58().slice(-4)}`
+    : null;
+
+  if (connected && short) {
+    return (
+      <div ref={ref} style={{ position: "relative" }}>
+        <button
+          onClick={() => setOpen((o) => !o)}
+          style={{
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "7px 14px", background: "var(--b-paper-08)",
+            border: "1px solid var(--b-rule)", cursor: "pointer",
+            fontFamily: "var(--font-geist-mono), monospace",
+            fontSize: 11, color: "var(--b-paper-60)", letterSpacing: "0.06em",
+          }}
+        >
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--b-gold)", flexShrink: 0 }} />
+          {short}
+        </button>
+        {open && (
+          <div style={{
+            position: "absolute", right: 0, top: "calc(100% + 6px)", zIndex: 100,
+            background: "var(--b-ink-2)", border: "1px solid var(--b-rule)",
+            minWidth: 160,
+          }}>
+            <button
+              onClick={() => { disconnect(); setOpen(false); }}
+              style={{
+                width: "100%", padding: "12px 16px", background: "transparent",
+                border: "none", cursor: "pointer", textAlign: "left",
+                fontFamily: "var(--font-geist-mono), monospace",
+                fontSize: 11, color: "var(--b-rust)", letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
+              Disconnect
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        disabled={connecting}
+        style={{
+          height: 34, padding: "0 18px", background: "var(--b-gold)",
+          color: "var(--b-ink)", border: "none", cursor: "pointer",
+          fontFamily: "var(--font-geist-mono), monospace",
+          fontSize: 11, fontWeight: 700, letterSpacing: "0.12em",
+          textTransform: "uppercase", opacity: connecting ? 0.6 : 1,
+        }}
+      >
+        {connecting ? "Connecting…" : "Connect Wallet"}
+      </button>
+      {open && (
+        <div style={{
+          position: "absolute", right: 0, top: "calc(100% + 6px)", zIndex: 100,
+          background: "var(--b-ink-2)", border: "1px solid var(--b-rule)",
+          minWidth: 200,
+        }}>
+          {wallets.filter((w) => w.readyState === "Installed" || w.readyState === "Loadable").length === 0 && (
+            <div style={{ padding: "14px 16px", fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)" }}>
+              No wallet detected.<br/>Install Phantom or Solflare.
+            </div>
+          )}
+          {wallets
+            .filter((w) => w.readyState === "Installed" || w.readyState === "Loadable")
+            .map((w) => (
+              <button
+                key={w.adapter.name}
+                onClick={async () => {
+                  setOpen(false);
+                  select(w.adapter.name);
+                  await connect().catch(() => {});
+                }}
+                style={{
+                  width: "100%", padding: "12px 16px", background: "transparent",
+                  border: "none", borderBottom: "1px solid var(--b-rule)",
+                  cursor: "pointer", textAlign: "left", display: "flex",
+                  alignItems: "center", gap: 10,
+                  fontFamily: "var(--font-geist), sans-serif",
+                  fontSize: 13, color: "var(--b-paper)",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--b-paper-08)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                {w.adapter.icon && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={w.adapter.icon} alt="" width={20} height={20} style={{ borderRadius: 4 }} />
+                )}
+                {w.adapter.name}
+              </button>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
    BNav
 ───────────────────────────────────────────────────────── */
 export function BNav() {
-  const { publicKey } = useWallet();
-  const addr = publicKey ? publicKey.toBase58() : null;
-  const short = addr ? `${addr.slice(0, 4)}…${addr.slice(-4)}` : null;
-
   return (
     <header
       style={{
@@ -318,56 +429,8 @@ export function BNav() {
         </nav>
 
         {/* Right: wallet */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, justifyContent: "flex-end" }}>
-          {short && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 7,
-                padding: "5px 12px",
-                border: "1px solid var(--b-rule)",
-                background: "var(--b-paper-08)",
-              }}
-            >
-              <span
-                className="b-pulse"
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  background: "var(--b-gold)",
-                  display: "inline-block",
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  fontFamily: "var(--font-geist-mono), monospace",
-                  fontSize: 11,
-                  color: "var(--b-paper-60)",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                {short}
-              </span>
-            </div>
-          )}
-          <WalletMultiButton
-            style={{
-              height: 34,
-              fontSize: 12,
-              padding: "0 16px",
-              background: short ? "transparent" : "var(--b-gold)",
-              color: short ? "var(--b-paper-60)" : "var(--b-ink)",
-              border: short ? "1px solid var(--b-rule)" : "none",
-              borderRadius: 0,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              fontFamily: "var(--font-geist-mono), monospace",
-            }}
-          />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          <WalletButton />
         </div>
       </div>
     </header>
