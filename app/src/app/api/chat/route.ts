@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 import { NextRequest } from "next/server";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const SYSTEM = `You are "Ask Poolly", a helpful AI assistant embedded in Poolly — a Solana-powered platform where people share subscription costs using trustless on-chain escrow.
 
@@ -27,7 +27,7 @@ Common retail prices (monthly):
 - Figma Professional: $15/editor/mo`;
 
 export async function POST(req: NextRequest) {
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GROQ_API_KEY) {
     return new Response(
       JSON.stringify({ error: "AI not configured" }),
       { status: 503, headers: { "Content-Type": "application/json" } }
@@ -40,21 +40,18 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const response = await anthropic.messages.create({
-          model: "claude-sonnet-4-6",
+        const response = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
           max_tokens: 512,
-          system: SYSTEM,
-          messages,
+          messages: [{ role: "system", content: SYSTEM }, ...messages],
           stream: true,
         });
 
-        for await (const event of response) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
+        for await (const chunk of response) {
+          const text = chunk.choices[0]?.delta?.content ?? "";
+          if (text) {
             controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`)
+              encoder.encode(`data: ${JSON.stringify({ text })}\n\n`)
             );
           }
         }

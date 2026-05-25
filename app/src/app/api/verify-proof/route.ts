@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const CATEGORY_HINTS: Record<number, string> = {
   0: "streaming service (Netflix, Spotify, Disney+, etc.) — look for account page, subscription plan, active status, and member slots",
@@ -27,23 +27,20 @@ export async function POST(req: NextRequest) {
     if (!proofUrl || typeof proofUrl !== "string") {
       return NextResponse.json({ error: "proofUrl required" }, { status: 400 });
     }
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ error: "AI verification not configured" }, { status: 503 });
     }
 
     const categoryHint = CATEGORY_HINTS[category as number] ?? CATEGORY_HINTS[5];
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
       max_tokens: 512,
       messages: [
         {
           role: "user",
           content: [
-            {
-              type: "image",
-              source: { type: "url", url: proofUrl },
-            },
+            { type: "image_url", image_url: { url: proofUrl, detail: "low" } },
             {
               type: "text",
               text: `You are verifying proof of service delivery for a shared subscription platform called Poolly.
@@ -74,10 +71,7 @@ Respond ONLY with a JSON object (no markdown, no explanation outside the JSON):
       ],
     });
 
-    const text =
-      response.content[0].type === "text" ? response.content[0].text.trim() : "";
-
-    // Strip markdown code fences if present
+    const text = response.choices[0]?.message?.content?.trim() ?? "";
     const cleaned = text.replace(/^```json\s*/i, "").replace(/\s*```$/, "");
     const result: VerifyResult = JSON.parse(cleaned);
 
