@@ -4,9 +4,9 @@
     {
       "name": "poolly-app",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": ["run", "dev", "--", "--webpack"],
       "cwd": "C:\\Users\\Desmo\\poolly\\app",
-      "port": 3000
+      "port": 3001
     }
   ]
 }
