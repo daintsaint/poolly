@@ -68,120 +68,155 @@ export default function CreatePoolPage() {
     }
   }
 
+  const totalCollected = form.pricePerSlot && form.maxSlots
+    ? (parseFloat(form.pricePerSlot || "0") * parseInt(form.maxSlots || "0"))
+    : null;
+  const hostReceives = totalCollected ? (totalCollected * 0.94).toFixed(2) : null;
+
   return (
-    <div className="mx-auto max-w-lg space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Create a Pool</h1>
-        <p className="text-sm text-slate-400 mt-1">
-          Set up a group buy. Funds are held in on-chain escrow until you deliver.
-        </p>
-      </div>
+    <div className="mx-auto max-w-6xl px-4 py-10">
+      <div className="max-w-xl mx-auto space-y-8">
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Field label="Pool Title">
-          <input
-            required
-            maxLength={64}
-            placeholder="e.g. Netflix Premium SG Group"
-            value={form.title}
-            onChange={(e) => update("title", e.target.value)}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
-          />
-        </Field>
-
-        <Field label="Category">
-          <select
-            value={form.category}
-            onChange={(e) => update("category", parseInt(e.target.value))}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-indigo-500 focus:outline-none"
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.icon} {c.label}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Price per member (USDC/cycle)">
-            <input
-              required
-              type="number"
-              min="0.01"
-              step="0.01"
-              placeholder="4.99"
-              value={form.pricePerSlot}
-              onChange={(e) => update("pricePerSlot", e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
-            />
-          </Field>
-
-          <Field label="Cycle (days)">
-            <input
-              required
-              type="number"
-              min="7"
-              max="365"
-              value={form.cycleDays}
-              onChange={(e) => update("cycleDays", e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-indigo-500 focus:outline-none"
-            />
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Max members">
-            <input
-              required
-              type="number"
-              min="2"
-              max="50"
-              value={form.maxSlots}
-              onChange={(e) => update("maxSlots", e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-indigo-500 focus:outline-none"
-            />
-          </Field>
-          <Field label="Min to activate">
-            <input
-              required
-              type="number"
-              min="2"
-              max={form.maxSlots}
-              value={form.minSlots}
-              onChange={(e) => update("minSlots", e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-white focus:border-indigo-500 focus:outline-none"
-            />
-          </Field>
-        </div>
-
-        {/* Summary */}
-        {form.pricePerSlot && form.maxSlots && (
-          <div className="rounded-lg bg-indigo-900/20 border border-indigo-800/40 p-4 text-sm space-y-1">
-            <p className="text-slate-300">
-              You collect{" "}
-              <span className="text-indigo-300 font-medium">
-                {(parseFloat(form.pricePerSlot || "0") * parseInt(form.maxSlots || "0")).toFixed(2)} USDC
-              </span>{" "}
-              when full (before 6% platform fee)
-            </p>
-          </div>
-        )}
-
-        {error && (
-          <p className="rounded-lg bg-red-900/20 border border-red-800/40 p-3 text-sm text-red-400">
-            {error}
+        {/* Page header */}
+        <div>
+          <h1 className="text-3xl font-black text-white">Create a Pool</h1>
+          <p className="text-sm mt-1.5" style={{ color: "var(--text-2)" }}>
+            Set your price and capacity. Funds are held in on-chain escrow until you deliver.
           </p>
-        )}
+        </div>
 
-        <button
-          type="submit"
-          disabled={loading || !wallet}
-          className="w-full rounded-lg bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? "Creating…" : !wallet ? "Connect wallet to continue" : "Create Pool"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          {/* Title */}
+          <Field label="Pool Title">
+            <input
+              required
+              maxLength={64}
+              placeholder="e.g. Netflix Premium SG Group"
+              value={form.title}
+              onChange={(e) => update("title", e.target.value)}
+              className="input-field"
+            />
+          </Field>
+
+          {/* Category */}
+          <Field label="Category">
+            <select
+              value={form.category}
+              onChange={(e) => update("category", parseInt(e.target.value))}
+              className="input-field"
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.icon} {c.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          {/* Price + Cycle */}
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Price per member (USDC)">
+              <div className="relative">
+                <input
+                  required
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="4.99"
+                  value={form.pricePerSlot}
+                  onChange={(e) => update("pricePerSlot", e.target.value)}
+                  className="input-field pr-16"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold"
+                  style={{ color: "var(--text-3)" }}>USDC</span>
+              </div>
+            </Field>
+            <Field label="Billing cycle (days)">
+              <input
+                required
+                type="number"
+                min="7"
+                max="365"
+                value={form.cycleDays}
+                onChange={(e) => update("cycleDays", e.target.value)}
+                className="input-field"
+              />
+            </Field>
+          </div>
+
+          {/* Slots */}
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Max members">
+              <input
+                required
+                type="number"
+                min="2"
+                max="50"
+                value={form.maxSlots}
+                onChange={(e) => update("maxSlots", e.target.value)}
+                className="input-field"
+              />
+            </Field>
+            <Field label="Min to activate pool">
+              <input
+                required
+                type="number"
+                min="2"
+                max={form.maxSlots}
+                value={form.minSlots}
+                onChange={(e) => update("minSlots", e.target.value)}
+                className="input-field"
+              />
+            </Field>
+          </div>
+
+          {/* Earnings preview */}
+          {totalCollected && (
+            <div className="rounded-2xl p-4 space-y-3"
+              style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.15)" }}>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#7c3aed" }}>
+                Earnings preview
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xl font-bold text-white">{totalCollected.toFixed(2)} USDC</p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>gross when full</p>
+                </div>
+                <div>
+                  <p className="text-xl font-bold" style={{ color: "#34d399" }}>{hostReceives} USDC</p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--text-3)" }}>you receive (94%)</p>
+                </div>
+              </div>
+              <p className="text-xs" style={{ color: "var(--text-3)" }}>
+                6% platform fee charged only when funds are released from escrow.
+              </p>
+            </div>
+          )}
+
+          {/* Error */}
+          {error && (
+            <div className="rounded-xl p-3.5 text-sm"
+              style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}>
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading || !wallet}
+            className="btn-primary w-full py-3.5 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Creating pool…" : !wallet ? "Connect wallet to continue" : "Create Pool"}
+          </button>
+
+          {!wallet && (
+            <p className="text-center text-xs" style={{ color: "var(--text-3)" }}>
+              Use the wallet button in the top right to connect.
+            </p>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
@@ -189,7 +224,7 @@ export default function CreatePoolPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-slate-300">{label}</label>
+      <label className="text-sm font-medium" style={{ color: "var(--text-2)" }}>{label}</label>
       {children}
     </div>
   );

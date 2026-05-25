@@ -1,16 +1,207 @@
 @import "tailwindcss";
 
 :root {
-  --background: #020617;
-  --foreground: #f1f5f9;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --bg-base: #07070e;
+  --bg-card: #0d0d18;
+  --bg-card-hover: #11111f;
+  --border: rgba(255,255,255,0.06);
+  --accent: #7c3aed;
+  --accent-glow: rgba(124,58,237,0.25);
+  --text-1: #f1f5f9;
+  --text-2: #94a3b8;
+  --text-3: #475569;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-base);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
 }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.3); border-radius: 3px; }
+
+/* ── Typography ─────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #c084fc 0%, #818cf8 45%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Cards ──────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: all 0.25s ease;
+}
+
+.card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(139,92,246,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(139,92,246,0.1);
+}
+
+.card-glow {
+  box-shadow: 0 0 0 1px rgba(139,92,246,0.2), 0 8px 32px rgba(124,58,237,0.15);
+}
+
+/* ── Buttons ────────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  box-shadow: 0 0 24px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
+  border-radius: 12px;
+  font-weight: 600;
+  color: white;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  box-shadow: 0 0 40px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.12);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
+  color: var(--text-1);
+}
+
+/* ── Status pills ───────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.pill-active  { background: rgba(16,185,129,0.1);  border: 1px solid rgba(16,185,129,0.25);  color: #34d399; }
+.pill-pending { background: rgba(251,191,36,0.1);  border: 1px solid rgba(251,191,36,0.25);  color: #fbbf24; }
+.pill-closed  { background: rgba(71,85,105,0.15);  border: 1px solid rgba(71,85,105,0.3);    color: #64748b; }
+
+/* ── Fill bar ───────────────────────────────────── */
+.fill-track {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.fill-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7c3aed, #38bdf8);
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Hero background ────────────────────────────── */
+.hero-bg {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% -5%,  rgba(124,58,237,0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 40% at 85% 45%,  rgba(56,189,248,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 35% at 15% 75%,  rgba(244,114,182,0.06) 0%, transparent 55%),
+    var(--bg-base);
+}
+
+/* ── Glassmorphism nav ──────────────────────────── */
+.glass-nav {
+  background: rgba(7,7,14,0.75);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* ── Service badge (floating in hero) ───────────── */
+.service-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(13,13,24,0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-1);
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  pointer-events: none;
+}
+
+/* ── Animations ─────────────────────────────────── */
+@keyframes float-a {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  40%     { transform: translateY(-14px) rotate(1.5deg); }
+  70%     { transform: translateY(7px) rotate(-1deg); }
+}
+@keyframes float-b {
+  0%,100% { transform: translateY(0px); }
+  50%     { transform: translateY(-20px); }
+}
+@keyframes float-c {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  35%     { transform: translateY(10px) rotate(-1deg); }
+  65%     { transform: translateY(-10px) rotate(1deg); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(124,58,237,0.4); }
+  70%  { box-shadow: 0 0 0 10px rgba(124,58,237,0); }
+  100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); }
+}
+
+.float-a { animation: float-a 8s ease-in-out infinite; }
+.float-b { animation: float-b 6s ease-in-out infinite; }
+.float-c { animation: float-c 9s ease-in-out infinite; }
+.animate-marquee { animation: marquee 35s linear infinite; }
+.animate-fade-up { animation: fade-up 0.7s ease-out both; }
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.pulse-ring { animation: pulse-ring 2s ease-out infinite; }
+
+/* ── Form inputs ────────────────────────────────── */
+.input-field {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: var(--text-1);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-appearance: none;
+}
+.input-field::placeholder { color: var(--text-3); }
+.input-field:focus {
+  border-color: rgba(124,58,237,0.5);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+}
+.input-field option { background: #0d0d18; color: var(--text-1); }
