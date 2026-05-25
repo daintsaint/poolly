@@ -155,7 +155,7 @@ export default function Home() {
           {/* Eyebrow */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, marginBottom: 32 }}>
             <div style={{ flex: 1, maxWidth: 120, height: 1, background: "var(--b-gold)", opacity: 0.5 }} />
-            <p className="b-eyebrow">CHAPTER IV · NON-CUSTODIAL ESCROW</p>
+            <p className="b-eyebrow">POOLLY · SMARTER POOLING</p>
             <div style={{ flex: 1, maxWidth: 120, height: 1, background: "var(--b-gold)", opacity: 0.5 }} />
           </div>
 
@@ -170,9 +170,8 @@ export default function Home() {
               marginBottom: 32,
             }}
           >
-            Money held by{" "}
-            <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>mathematics</em>
-            ,<br />not men.
+            Full price is{" "}
+            <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>overrated.</em>
           </h1>
 
           {/* Lede */}
@@ -185,8 +184,8 @@ export default function Home() {
               margin: "0 auto 40px",
             }}
           >
-            Split subscriptions with anyone. Each payment locks into a Solana smart
-            contract — released only when delivery is proven. No middleman. No trust required.
+            Split any subscription with a group. Each payment locks in escrow — released
+            only when delivery is proven. Smarter pooling, built on Solana.
           </p>
 
           {/* CTAs */}
@@ -633,9 +632,9 @@ export default function Home() {
               marginBottom: 32,
             }}
           >
-            &ldquo;Trust is what we ask for when we haven&apos;t{" "}
-            <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>built</em>{" "}
-            something better. Poolly is the something better.&rdquo;
+            &ldquo;Full price is a solo problem.{" "}
+            <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>Smarter pooling</em>{" "}
+            is a group solution.&rdquo;
           </p>
           <p
             style={{

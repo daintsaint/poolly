@@ -165,7 +165,7 @@ export function Ticker({ value, prefix = "", suffix = "", dur = 1200, decimals =
    BTicker — animated marquee bar
 ───────────────────────────────────────────────────────── */
 const TICKER_ITEMS = [
-  { label: "CHAPTER", value: "IV · MAY MMXXVI" },
+  { label: "POOLLY", value: "SMARTER POOLING" },
   { label: "LIVE POOLS", value: "1,284" },
   { label: "MEMBERS", value: "5,917" },
   { label: "IN ESCROW", value: "$184,920" },
@@ -683,7 +683,7 @@ export function BFooter() {
                 maxWidth: 240,
               }}
             >
-              Non-custodial subscription sharing. Money held by mathematics, not men.
+              Smarter pooling. Full price is overrated.
             </p>
           </div>
 
@@ -733,7 +733,7 @@ export function BFooter() {
               textTransform: "uppercase",
             }}
           >
-            MMXXVI · POOLLY LABS · ALL RIGHTS RESERVED · NON-CUSTODIAL BY DESIGN
+            MMXXVI · POOLLY LABS · ALL RIGHTS RESERVED · FULL PRICE IS OVERRATED
           </p>
           <p
             style={{

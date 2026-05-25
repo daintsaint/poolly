@@ -15,8 +15,8 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Poolly — The Vault",
-  description: "Money held by mathematics, not men. Non-custodial subscription sharing on Solana.",
+  title: "Poolly — Smarter pooling.",
+  description: "Smarter pooling. Full price is overrated. Split subscriptions on Solana.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
