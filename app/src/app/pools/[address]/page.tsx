@@ -18,6 +18,7 @@ import {
   type PoolAccount,
 } from "@/lib/poolly-client";
 import { CATEGORIES, PLATFORM_WALLET } from "@/lib/constants";
+import { ProofVerifier } from "@/components/proof-verifier";
 
 export default function PoolDetailPage() {
   const { address } = useParams<{ address: string }>();
@@ -93,14 +94,15 @@ export default function PoolDetailPage() {
     }
   }
 
-  async function submitProof() {
-    if (!wallet || !pool || !proofUri.trim()) return;
+  async function submitProof(uri?: string) {
+    const resolvedUri = uri ?? proofUri;
+    if (!wallet || !pool || !resolvedUri.trim()) return;
     setSubmittingProof(true);
     setHostError(""); setHostSuccess("");
     try {
       const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
       const program = getProgram(provider);
-      await program.methods.submitProof(proofUri.trim())
+      await program.methods.submitProof(resolvedUri.trim())
         .accounts({ host: wallet.publicKey, pool: pool.publicKey }).rpc();
       setProofUri("");
       setHostSuccess("Proof submitted — cycle recorded on-chain.");
@@ -369,31 +371,22 @@ export default function PoolDetailPage() {
               </div>
             )}
 
-            {/* Submit proof */}
+            {/* Submit proof — AI-verified */}
             {!closed && (
               <div className="space-y-3">
-                <div>
+                <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-white text-sm">Submit Proof of Delivery</h3>
-                  <p className="text-xs mt-1" style={{ color: "var(--text-2)" }}>
-                    Paste a link to evidence (screenshot, invoice, login confirmation) that you delivered the service this cycle.
-                  </p>
+                  <span className="pill" style={{
+                    background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)",
+                    color: "#a78bfa", fontSize: "10px", padding: "2px 8px",
+                  }}>AI Verified</span>
                 </div>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    placeholder="https://drive.google.com/…"
-                    value={proofUri}
-                    onChange={(e) => setProofUri(e.target.value)}
-                    className="input-field flex-1"
-                  />
-                  <button
-                    onClick={submitProof}
-                    disabled={submittingProof || !proofUri.trim()}
-                    className="btn-primary px-5 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-                  >
-                    {submittingProof ? "Submitting…" : "Submit"}
-                  </button>
-                </div>
+                <ProofVerifier
+                  poolTitle={pool.title}
+                  category={pool.category}
+                  onConfirmed={(uri) => submitProof(uri)}
+                  submitting={submittingProof}
+                />
               </div>
             )}
 

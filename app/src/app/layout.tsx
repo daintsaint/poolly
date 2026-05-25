@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Navbar } from "@/components/navbar";
+import { Chatbot } from "@/components/chatbot";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <Navbar />
           {children}
+          <Chatbot />
         </Providers>
       </body>
     </html>
