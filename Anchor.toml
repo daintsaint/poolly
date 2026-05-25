@@ -6,10 +6,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-poolly = "7kc872pcWWcyrbVBZdZ3YPNzccJkkD7qxriNwEjZfysd"
+poolly = "Edv6BNFLKPKJ4KUWco2MEmGSTsdSU4xBWFsaFFmezpcq"
 
 [programs.devnet]
-poolly = "7kc872pcWWcyrbVBZdZ3YPNzccJkkD7qxriNwEjZfysd"
+poolly = "Edv6BNFLKPKJ4KUWco2MEmGSTsdSU4xBWFsaFFmezpcq"
 
 [registry]
 url = "https://api.apr.dev"

@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { AnchorProvider, BN } from "@coral-xyz/anchor";
-import { PublicKey } from "@solana/web3.js";
+import { SystemProgram } from "@solana/web3.js";
+import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { CATEGORIES, USDC_MINT_DEVNET } from "@/lib/constants";
 import { derivePoolPda, getProgram } from "@/lib/poolly-client";
 
@@ -52,6 +53,9 @@ export default function CreatePoolPage() {
         .accounts({
           host: wallet.publicKey,
           mint: USDC_MINT_DEVNET,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
 

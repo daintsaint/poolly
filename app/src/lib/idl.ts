@@ -78,6 +78,43 @@ export type Poolly = {
   ];
   types: [
     {
+      name: "pool";
+      type: {
+        kind: "struct";
+        fields: [
+          { name: "host"; type: "pubkey" },
+          { name: "mint"; type: "pubkey" },
+          { name: "title"; type: "string" },
+          { name: "category"; type: "u8" },
+          { name: "pricePerSlot"; type: "u64" },
+          { name: "maxSlots"; type: "u8" },
+          { name: "minSlots"; type: "u8" },
+          { name: "filledSlots"; type: "u8" },
+          { name: "cycleDays"; type: "u16" },
+          { name: "status"; type: { defined: { name: "poolStatus" } } },
+          { name: "createdAt"; type: "i64" },
+          { name: "nextChargeAt"; type: "i64" },
+          { name: "totalCycles"; type: "u32" },
+          { name: "lastProofUri"; type: "string" },
+          { name: "bump"; type: "u8" },
+          { name: "escrowBump"; type: "u8" }
+        ];
+      };
+    },
+    {
+      name: "memberRecord";
+      type: {
+        kind: "struct";
+        fields: [
+          { name: "pool"; type: "pubkey" },
+          { name: "wallet"; type: "pubkey" },
+          { name: "joinedAt"; type: "i64" },
+          { name: "cyclesPaid"; type: "u32" },
+          { name: "bump"; type: "u8" }
+        ];
+      };
+    },
+    {
       name: "createPoolParams";
       type: {
         kind: "struct";
@@ -113,7 +150,7 @@ export type Poolly = {
 };
 
 export const IDL: Poolly = {
-  address: "7kc872pcWWcyrbVBZdZ3YPNzccJkkD7qxriNwEjZfysd",
+  address: "Edv6BNFLKPKJ4KUWco2MEmGSTsdSU4xBWFsaFFmezpcq",
   metadata: { name: "poolly", version: "0.1.0", spec: "0.1.0" },
   instructions: [
     {
@@ -185,6 +222,43 @@ export const IDL: Poolly = {
     { name: "memberRecord", discriminator: [12, 166, 195, 0, 252, 242, 91, 239] },
   ],
   types: [
+    {
+      name: "pool",
+      type: {
+        kind: "struct",
+        fields: [
+          { name: "host", type: "pubkey" },
+          { name: "mint", type: "pubkey" },
+          { name: "title", type: "string" },
+          { name: "category", type: "u8" },
+          { name: "pricePerSlot", type: "u64" },
+          { name: "maxSlots", type: "u8" },
+          { name: "minSlots", type: "u8" },
+          { name: "filledSlots", type: "u8" },
+          { name: "cycleDays", type: "u16" },
+          { name: "status", type: { defined: { name: "poolStatus" } } },
+          { name: "createdAt", type: "i64" },
+          { name: "nextChargeAt", type: "i64" },
+          { name: "totalCycles", type: "u32" },
+          { name: "lastProofUri", type: "string" },
+          { name: "bump", type: "u8" },
+          { name: "escrowBump", type: "u8" },
+        ],
+      },
+    },
+    {
+      name: "memberRecord",
+      type: {
+        kind: "struct",
+        fields: [
+          { name: "pool", type: "pubkey" },
+          { name: "wallet", type: "pubkey" },
+          { name: "joinedAt", type: "i64" },
+          { name: "cyclesPaid", type: "u32" },
+          { name: "bump", type: "u8" },
+        ],
+      },
+    },
     {
       name: "createPoolParams",
       type: {

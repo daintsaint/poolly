@@ -4,7 +4,7 @@ use anchor_spl::{
     token::{Mint, Token, TokenAccount, Transfer},
 };
 
-declare_id!("7kc872pcWWcyrbVBZdZ3YPNzccJkkD7qxriNwEjZfysd");
+declare_id!("Edv6BNFLKPKJ4KUWco2MEmGSTsdSU4xBWFsaFFmezpcq");
 
 pub const POOL_SEED: &[u8] = b"pool";
 pub const ESCROW_SEED: &[u8] = b"escrow";
@@ -38,7 +38,7 @@ pub mod poolly {
         pool.next_charge_at = 0;
         pool.total_cycles = 0;
         pool.bump = ctx.bumps.pool;
-        pool.escrow_bump = ctx.bumps.escrow_token;
+        pool.escrow_bump = 0; // ATA; bump not needed
 
         emit!(PoolCreated {
             pool: pool.key(),

@@ -46,8 +46,10 @@ export async function fetchAllPools(
 ): Promise<PoolAccount[]> {
   const provider = new AnchorProvider(connection, {} as never, {});
   const program = getProgram(provider);
-  const accounts = await program.account.pool.all();
-  return accounts.map((a) => ({ publicKey: a.publicKey, ...a.account }));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const accounts = await (program.account as any).pool.all();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return accounts.map((a: any) => ({ publicKey: a.publicKey, ...a.account }));
 }
 
 export function isPoolActive(pool: PoolAccount): boolean {
