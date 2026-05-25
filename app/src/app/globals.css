@@ -2,6 +2,7 @@
 
 /* ── Legacy tokens (kept for pool-card backward compat) ──── */
 :root {
+  --poolly-accent:  #1F4E3D;
   --bg-base: #0C0B09;
   --bg-card: #1F1C16;
   --bg-card-hover: #252118;

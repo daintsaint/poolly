@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useEffect, useRef, useState } from "react";
+import { PoollyLogo } from "@/components/PoollyLogo";
 
 /* ─────────────────────────────────────────────────────────
    ServiceMark
@@ -361,45 +362,8 @@ export function BNav() {
         }}
       >
         {/* Left: wordmark */}
-        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              background: "var(--b-paper)",
-              color: "var(--b-ink)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--font-newsreader), Georgia, serif",
-              fontStyle: "italic",
-              fontWeight: 700,
-              fontSize: 20,
-              userSelect: "none",
-            }}
-          >
-            P
-          </div>
-          <span
-            style={{
-              fontFamily: "var(--font-geist), sans-serif",
-              fontSize: 14,
-              color: "var(--b-paper-60)",
-              letterSpacing: "0.02em",
-            }}
-          >
-            Poolly ·{" "}
-            <em
-              style={{
-                fontFamily: "var(--font-newsreader), Georgia, serif",
-                fontStyle: "italic",
-                color: "var(--b-gold)",
-                fontWeight: 300,
-              }}
-            >
-              The Vault
-            </em>
-          </span>
+        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center" }}>
+          <PoollyLogo variant="lockup" size={28} onDark />
         </Link>
 
         {/* Center: nav links */}
@@ -658,22 +622,7 @@ export function BFooter() {
         <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1fr 1fr", gap: 48, marginBottom: 48 }}>
           {/* Wordmark */}
           <div>
-            <p
-              className="b-serif"
-              style={{ fontSize: 56, lineHeight: 1, color: "var(--b-paper)", marginBottom: 16 }}
-            >
-              Poolly,{" "}
-              <em
-                style={{
-                  fontFamily: "var(--font-newsreader), Georgia, serif",
-                  fontStyle: "italic",
-                  color: "var(--b-gold)",
-                  fontWeight: 300,
-                }}
-              >
-                The Vault.
-              </em>
-            </p>
+            <PoollyLogo variant="stacked" size={48} onDark style={{ marginBottom: 16 }} />
             <p
               style={{
                 fontFamily: "var(--font-geist), sans-serif",

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // turbopack: {} silences the "webpack config with no turbopack config" error in
+  // dev. Railway production builds still run `next build --webpack` explicitly.
+  turbopack: {},
   webpack: (config) => {
     // Solana / wallet-adapter packages pull in Node.js built-ins.
     // Replace them with browser-safe stubs so the client bundle compiles.

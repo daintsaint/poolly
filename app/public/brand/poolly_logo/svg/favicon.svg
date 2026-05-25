@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Poolly">
+  <title>Poolly</title>
+  
+  
+  
+  
+  <g transform="translate(2 6) scale(0.175)">
+    <circle cx="58" cy="46" r="40" fill="none" stroke="currentColor" stroke-width="6"></circle>
+    <circle cx="102" cy="46" r="40" fill="none" stroke="currentColor" stroke-width="6"></circle>
+    <path d="M 80 12.59 A 40 40 0 0 1 80 79.41 A 40 40 0 0 1 80 12.59" fill="var(--poolly-accent, #1F4E3D)"></path>
+    <circle cx="58" cy="46" r="40" fill="none" stroke="currentColor" stroke-width="6"></circle>
+    <circle cx="102" cy="46" r="40" fill="none" stroke="currentColor" stroke-width="6"></circle>
+  </g>
+</svg>

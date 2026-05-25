@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Poolly — Smarter pooling. Full price is overrated.">
+  <title>Poolly — Smarter pooling. Full price is overrated.</title>
+  
+  <rect width="1200" height="630" fill="#F2EDE3"></rect>
+
+  
+  <line x1="80" y1="80" x2="160" y2="80" stroke="#14110C" stroke-width="1.5"></line>
+  <text x="180" y="86" font-family="ui-monospace, &#39;Geist Mono&#39;, monospace" font-size="13" letter-spacing="2.8" fill="#14110C" font-weight="500">POOLLY · NON-CUSTODIAL ESCROW · EST. MMXXVI</text>
+
+  
+  <g transform="translate(80 220)">
+    
+    <g transform="translate(0 0) scale(1.6)">
+      <circle cx="58" cy="46" r="40" fill="none" stroke="#14110C" stroke-width="3"></circle>
+      <circle cx="102" cy="46" r="40" fill="none" stroke="#14110C" stroke-width="3"></circle>
+      <path d="M 80 12.59 A 40 40 0 0 1 80 79.41 A 40 40 0 0 1 80 12.59" fill="#1F4E3D"></path>
+      <circle cx="58" cy="46" r="40" fill="none" stroke="#14110C" stroke-width="3"></circle>
+      <circle cx="102" cy="46" r="40" fill="none" stroke="#14110C" stroke-width="3"></circle>
+    </g>
+    
+    <text x="290" y="135" font-family="&#39;Instrument Serif&#39;, Georgia, serif" font-size="200" letter-spacing="-8" fill="#14110C">Poolly</text>
+  </g>
+
+  
+  <text x="80" y="465" font-family="&#39;Instrument Serif&#39;, Georgia, serif" font-style="italic" font-size="56" fill="#14110C" letter-spacing="-1">Smarter pooling. <tspan fill="#1F4E3D">Full price is overrated.</tspan></text>
+
+  
+  <line x1="80" y1="540" x2="1120" y2="540" stroke="#14110C" stroke-width="0.8" stroke-opacity="0.25"></line>
+  <text x="80" y="580" font-family="ui-monospace, &#39;Geist Mono&#39;, monospace" font-size="13" letter-spacing="2.4" fill="#14110C" fill-opacity="0.6">SOLANA · NON-CUSTODIAL · OPEN SOURCE</text>
+  <text x="1120" y="580" text-anchor="end" font-family="ui-monospace, &#39;Geist Mono&#39;, monospace" font-size="13" letter-spacing="2.4" fill="#14110C" fill-opacity="0.6">POOLLY.SOL</text>
+</svg>

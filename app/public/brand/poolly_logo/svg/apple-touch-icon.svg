@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="Poolly">
+  <title>Poolly</title>
+  
+  <rect width="180" height="180" fill="#0C0B09"></rect>
+  <g transform="translate(20 64) scale(0.875)">
+    <circle cx="58" cy="46" r="40" fill="none" stroke="#F2EDE3" stroke-width="3.5"></circle>
+    <circle cx="102" cy="46" r="40" fill="none" stroke="#F2EDE3" stroke-width="3.5"></circle>
+    <path d="M 80 12.59 A 40 40 0 0 1 80 79.41 A 40 40 0 0 1 80 12.59" fill="#B8945A"></path>
+    <circle cx="58" cy="46" r="40" fill="none" stroke="#F2EDE3" stroke-width="3.5"></circle>
+    <circle cx="102" cy="46" r="40" fill="none" stroke="#F2EDE3" stroke-width="3.5"></circle>
+  </g>
+</svg>
