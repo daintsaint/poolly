@@ -1,9 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useEffect, useRef, useState } from "react";
+
+const WalletMultiButton = dynamic(
+  () => import("@solana/wallet-adapter-react-ui").then((m) => m.WalletMultiButton),
+  { ssr: false }
+);
 
 /* ─────────────────────────────────────────────────────────
    ServiceMark
@@ -289,10 +294,10 @@ export function BNav() {
         {/* Center: nav links */}
         <nav style={{ display: "flex", alignItems: "center", gap: 32 }}>
           {[
-            { label: "The Catalog", href: "/pools" },
-            { label: "Mechanism", href: "/#mechanism" },
-            { label: "Host", href: "/dashboard/host" },
-            { label: "The Club", href: "/dashboard/member" },
+            { label: "Browse", href: "/pools" },
+            { label: "Share a Plan", href: "/pools/create" },
+            { label: "My Dashboard", href: "/dashboard/member" },
+            { label: "Host Dashboard", href: "/dashboard/host" },
           ].map((l) => (
             <Link
               key={l.href}

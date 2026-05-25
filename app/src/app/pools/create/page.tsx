@@ -8,6 +8,7 @@ import { SystemProgram } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { CATEGORIES, USDC_MINT_DEVNET } from "@/lib/constants";
 import { derivePoolPda, getProgram } from "@/lib/poolly-client";
+import { BNav, BTicker, BFooter } from "@/components/vault-ui";
 
 export default function CreatePoolPage() {
   const router = useRouter();
@@ -74,14 +75,19 @@ export default function CreatePoolPage() {
   const hostReceives = totalCollected ? (totalCollected * 0.94).toFixed(2) : null;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <div className="max-w-xl mx-auto space-y-8">
+    <div style={{ background: "var(--b-ink)", minHeight: "100vh" }}>
+      <BNav />
+      <BTicker />
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: "64px 40px 80px" }}>
 
         {/* Page header */}
-        <div>
-          <h1 className="text-3xl font-black text-white">Share a Subscription</h1>
-          <p className="text-sm mt-1.5" style={{ color: "var(--text-2)" }}>
-            Set your price and capacity. Funds are held in on-chain escrow until you deliver.
+        <div style={{ marginBottom: 48 }}>
+          <p className="b-eyebrow" style={{ marginBottom: 16 }}>HOST · SHARE A PLAN</p>
+          <h1 className="b-serif" style={{ fontSize: "clamp(40px, 5vw, 72px)", lineHeight: 1, color: "var(--b-paper)" }}>
+            Share a <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>subscription.</em>
+          </h1>
+          <p style={{ fontFamily: "var(--font-geist), sans-serif", fontSize: 15, lineHeight: 1.6, color: "var(--b-paper-60)", marginTop: 16, maxWidth: 520 }}>
+            Set your price and seat count. Funds lock into escrow — released only when you submit proof of delivery.
           </p>
         </div>
 
@@ -217,6 +223,7 @@ export default function CreatePoolPage() {
           )}
         </form>
       </div>
+      <BFooter />
     </div>
   );
 }
