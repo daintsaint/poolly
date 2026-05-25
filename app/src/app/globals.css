@@ -205,3 +205,42 @@ body {
   box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
 }
 .input-field option { background: #0d0d18; color: var(--text-1); }
+
+/* ── Category gradient cards ────────────────────── */
+.cat-gradient-0 { background: linear-gradient(135deg, #1a0533 0%, #3b0764 50%, #1e1040 100%); border-color: rgba(167,139,250,0.25); }
+.cat-gradient-1 { background: linear-gradient(135deg, #052e16 0%, #064e3b 50%, #0f2f5a 100%); border-color: rgba(52,211,153,0.25); }
+.cat-gradient-2 { background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #4c0519 100%); border-color: rgba(248,113,113,0.25); }
+.cat-gradient-3 { background: linear-gradient(135deg, #172554 0%, #1e3a8a 50%, #0c4a6e 100%); border-color: rgba(96,165,250,0.25); }
+.cat-gradient-4 { background: linear-gradient(135deg, #1c1917 0%, #44403c 50%, #1c1917 100%); border-color: rgba(214,211,209,0.25); }
+.cat-gradient-5 { background: linear-gradient(135deg, #0c1a2e 0%, #1e3a5f 50%, #0a1628 100%); border-color: rgba(56,189,248,0.25); }
+
+/* ── Card info panels ───────────────────────────── */
+.info-panel {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.info-panel-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  margin-bottom: 3px;
+}
+.info-panel-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+/* ── Savings comparison bars ────────────────────── */
+.savings-row { display: flex; flex-direction: column; gap: 6px; }
+.savings-bar-wrap { display: flex; align-items: center; gap: 12px; }
+.savings-bar-label { width: 80px; font-size: 13px; font-weight: 600; color: var(--text-2); flex-shrink: 0; }
+.savings-bar-track { flex: 1; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.04); overflow: hidden; position: relative; }
+.savings-bar-fill-retail { height: 100%; border-radius: 8px; background: linear-gradient(90deg, rgba(71,85,105,0.6), rgba(100,116,139,0.4)); display: flex; align-items: center; padding: 0 10px; }
+.savings-bar-fill-pool   { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #7c3aed, #38bdf8); display: flex; align-items: center; padding: 0 10px; }
+.savings-bar-amount { font-size: 12px; font-weight: 700; color: white; white-space: nowrap; }

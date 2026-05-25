@@ -155,7 +155,7 @@ export default function PoolDetailPage() {
       }).rpc();
 
       setConfirmClose(false);
-      setHostSuccess("Pool closed. Any remaining escrow funds returned to you.");
+      setHostSuccess("Plan closed. Any remaining escrow funds returned to you.");
       await loadPool();
     } catch (e: unknown) {
       setHostError(e instanceof Error ? e.message : "Transaction failed");
@@ -303,7 +303,7 @@ export default function PoolDetailPage() {
               >
                 {joining ? "Joining…"
                   : !wallet ? "Connect wallet to join"
-                  : pool.filledSlots >= pool.maxSlots ? "Pool is full"
+                  : pool.filledSlots >= pool.maxSlots ? "No spots left"
                   : `Join for ${formatUsdc(pool.pricePerSlot)} USDC`}
               </button>
               <p className="text-center text-xs" style={{ color: "var(--text-3)" }}>
@@ -314,7 +314,7 @@ export default function PoolDetailPage() {
 
           {closed && !isHost && (
             <p className="text-center text-sm py-2" style={{ color: "var(--text-3)" }}>
-              This pool is closed and no longer accepting members.
+              This plan is closed and no longer accepting members.
             </p>
           )}
         </div>

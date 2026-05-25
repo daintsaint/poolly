@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "poolly-dev",
+      "runtimeExecutable": "/Users/desmondddd/poolly/app/node_modules/.bin/next",
+      "runtimeArgs": ["dev", "--turbopack"],
+      "port": 3000
+    }
+  ]
+}

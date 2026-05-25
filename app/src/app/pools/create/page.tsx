@@ -79,7 +79,7 @@ export default function CreatePoolPage() {
 
         {/* Page header */}
         <div>
-          <h1 className="text-3xl font-black text-white">Create a Pool</h1>
+          <h1 className="text-3xl font-black text-white">Share a Subscription</h1>
           <p className="text-sm mt-1.5" style={{ color: "var(--text-2)" }}>
             Set your price and capacity. Funds are held in on-chain escrow until you deliver.
           </p>
@@ -88,7 +88,7 @@ export default function CreatePoolPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
 
           {/* Title */}
-          <Field label="Pool Title">
+          <Field label="Subscription Title">
             <input
               required
               maxLength={64}
@@ -158,7 +158,7 @@ export default function CreatePoolPage() {
                 className="input-field"
               />
             </Field>
-            <Field label="Min to activate pool">
+            <Field label="Min to activate">
               <input
                 required
                 type="number"
@@ -207,7 +207,7 @@ export default function CreatePoolPage() {
             disabled={loading || !wallet}
             className="btn-primary w-full py-3.5 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating pool…" : !wallet ? "Connect wallet to continue" : "Create Pool"}
+            {loading ? "Publishing…" : !wallet ? "Connect wallet to continue" : "Publish Plan"}
           </button>
 
           {!wallet && (

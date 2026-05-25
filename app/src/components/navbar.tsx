@@ -31,7 +31,7 @@ export function Navbar() {
           <Link href="/pools"
             className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
             style={{ color: path.startsWith("/pools") ? "white" : "var(--text-2)", background: path.startsWith("/pools") ? "rgba(255,255,255,0.06)" : "transparent" }}>
-            Browse Pools
+            Browse Plans
           </Link>
         </nav>
 
@@ -42,7 +42,7 @@ export function Navbar() {
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M6 1v10M1 6h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             </svg>
-            Create Pool
+            Share a Plan
           </Link>
           <WalletMultiButton style={{
             height: "36px", fontSize: "13px", padding: "0 14px",

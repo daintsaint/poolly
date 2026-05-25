@@ -48,22 +48,21 @@ function PoolsInner() {
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-white">Browse Pools</h1>
+          <h1 className="text-3xl font-black text-white">Browse Plans</h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-2)" }}>
-            {loading ? "Loading…" : `${filtered.length} active pool${filtered.length !== 1 ? "s" : ""}`}
+            {loading ? "Loading…" : `${filtered.length} active plan${filtered.length !== 1 ? "s" : ""}`}
           </p>
         </div>
         <Link href="/pools/create" className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm self-start sm:self-auto">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M6 1v10M1 6h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
           </svg>
-          Create Pool
+          Share a Plan
         </Link>
       </div>
 
       {/* Filters row */}
       <div className="flex flex-col sm:flex-row gap-3">
-        {/* Category pills */}
         <div className="flex gap-2 flex-wrap flex-1">
           <button
             onClick={() => setCategory(null)}
@@ -94,7 +93,6 @@ function PoolsInner() {
           ))}
         </div>
 
-        {/* Sort */}
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
@@ -115,7 +113,7 @@ function PoolsInner() {
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-52 rounded-2xl animate-pulse"
+            <div key={i} className="h-64 rounded-2xl animate-pulse"
               style={{ background: "rgba(255,255,255,0.04)" }}/>
           ))}
         </div>
@@ -123,12 +121,12 @@ function PoolsInner() {
         <div className="rounded-2xl py-20 text-center"
           style={{ border: "1px dashed rgba(255,255,255,0.08)" }}>
           <p className="text-4xl mb-3">🌊</p>
-          <p className="font-semibold text-white">No pools found</p>
+          <p className="font-semibold text-white">No plans found</p>
           <p className="text-sm mt-1 mb-6" style={{ color: "var(--text-2)" }}>
-            Be the first to create one in this category.
+            Be the first to share one in this category.
           </p>
           <Link href="/pools/create" className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 text-sm">
-            Create a Pool
+            Share a Plan
           </Link>
         </div>
       ) : (
