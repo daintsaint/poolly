@@ -1,23 +1,32 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
-import { Navbar } from "@/components/navbar";
 import { Chatbot } from "@/components/chatbot";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  weight: ["200", "300", "400"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Poolly — Split subscriptions. On-chain.",
-  description: "The trustless way to share subscription costs with anyone. Powered by Solana.",
+  title: "Poolly — The Vault",
+  description: "Money held by mathematics, not men. Non-custodial subscription sharing on Solana.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} font-sans antialiased`} style={{ background: "var(--bg-base)", color: "var(--text-1)" }}>
+      <body
+        className={`${geist.variable} ${geistMono.variable} ${newsreader.variable} antialiased`}
+        style={{ background: "#0C0B09", color: "#EDE6D6", fontFamily: "var(--font-geist), sans-serif" }}
+      >
         <Providers>
-          <Navbar />
           {children}
           <Chatbot />
         </Providers>

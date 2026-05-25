@@ -1,8 +1,6 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 const CATEGORY_HINTS: Record<number, string> = {
   0: "streaming service (Netflix, Spotify, Disney+, etc.) — look for account page, subscription plan, active status, and member slots",
   1: "productivity tool (Notion, Microsoft 365, Google Workspace, etc.) — check plan type, license count, billing status",
@@ -30,6 +28,8 @@ export async function POST(req: NextRequest) {
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ error: "AI verification not configured" }, { status: 503 });
     }
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const categoryHint = CATEGORY_HINTS[category as number] ?? CATEGORY_HINTS[5];
 

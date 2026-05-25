@@ -1,7 +1,11 @@
 import Groq from "groq-sdk";
 import { NextRequest } from "next/server";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groq: Groq | null = null;
+function getGroq(): Groq {
+  if (!groq) groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  return groq;
+}
 
 const SYSTEM = `You are "Ask Poolly", a helpful AI assistant embedded in Poolly — a Solana-powered platform where people share subscription costs using trustless on-chain escrow.
 
@@ -40,7 +44,7 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const response = await groq.chat.completions.create({
+        const response = await getGroq().chat.completions.create({
           model: "llama-3.3-70b-versatile",
           max_tokens: 512,
           messages: [{ role: "system", content: SYSTEM }, ...messages],

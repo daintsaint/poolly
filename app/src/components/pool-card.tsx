@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/constants";
 import { formatUsdc, isPoolActive, isPoolPending, type PoolAccount } from "@/lib/poolly-client";
+import { ServiceMark, PoolSlots } from "@/components/vault-ui";
 
 const CATEGORY_RETAIL: Record<number, number> = {
   0: 22,
@@ -13,131 +14,141 @@ const CATEGORY_RETAIL: Record<number, number> = {
   5: 20,
 };
 
-type Props = { pool: PoolAccount };
+const CAT_TO_SVC: Record<number, string> = {
+  0: "netflix",
+  1: "ms365",
+  2: "peloton",
+  3: "notion",
+  4: "adobe",
+  5: "chatgpt",
+};
 
-export function PoolCard({ pool }: Props) {
+type Props = { pool: PoolAccount; accent?: boolean };
+
+export function PoolCard({ pool, accent = false }: Props) {
   const category  = CATEGORIES.find((c) => c.id === pool.category) ?? CATEGORIES[5];
+  const svcId     = CAT_TO_SVC[pool.category] ?? "chatgpt";
   const slotsLeft = pool.maxSlots - pool.filledSlots;
   const active    = isPoolActive(pool);
   const pending   = isPoolPending(pool);
   const priceUsd  = pool.pricePerSlot.toNumber() / 1_000_000;
   const retail    = CATEGORY_RETAIL[pool.category] ?? 20;
   const savings   = Math.max(0, Math.round(((retail - priceUsd) / retail) * 100));
-  const hostAddr  = pool.host.toBase58();
-  const hostShort = `${hostAddr.slice(0, 4)}…${hostAddr.slice(-4)}`;
 
   return (
     <Link
       href={`/pools/${pool.publicKey.toBase58()}`}
-      className="card group block"
-      style={{ textDecoration: "none", padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}
+      className="lift"
+      style={{
+        textDecoration: "none",
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
+        padding: 24,
+        background: accent ? "var(--b-paper)" : "var(--b-ink-3)",
+        border: `1px solid ${accent ? "transparent" : "var(--b-rule)"}`,
+        minHeight: 220,
+      }}
     >
-      {/* Row 1: icon + title + category badge + availability pill */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
-        <div style={{
-          height: "48px", width: "48px", borderRadius: "14px",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "24px", flexShrink: 0,
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid rgba(255,255,255,0.09)",
-        }}>
-          {category.icon}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p className="group-hover:text-violet-300 transition-colors"
-            style={{ fontWeight: 700, fontSize: "15px", color: "var(--text-1)", lineHeight: 1.3, marginBottom: "5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {pool.title}
-          </p>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-            <span style={{
-              fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "999px",
-              background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)",
-              color: "var(--text-3)", letterSpacing: "0.02em",
-            }}>
-              {category.label}
-            </span>
-            {slotsLeft > 0 && (active || pending) ? (
-              <span style={{
-                fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "999px",
-                background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)",
-                color: "#34d399",
-              }}>
-                {slotsLeft} open
-              </span>
-            ) : (
-              <span style={{
-                fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "999px",
-                background: "rgba(71,85,105,0.15)", border: "1px solid rgba(71,85,105,0.3)",
-                color: "#64748b",
-              }}>
-                {active || pending ? "Full" : "Closed"}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Row 2: host address + on-chain badge */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: "8px",
-        padding: "7px 10px", borderRadius: "10px",
-        background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.05)",
-      }}>
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
-          <circle cx="6" cy="4" r="2.5" stroke="#64748b" strokeWidth="1.2"/>
-          <path d="M1 11c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5" stroke="#64748b" strokeWidth="1.2" strokeLinecap="round"/>
-        </svg>
-        <span style={{ fontFamily: "monospace", fontSize: "11px", color: "var(--text-3)", flex: 1 }}>{hostShort}</span>
-        <span style={{
-          fontSize: "10px", fontWeight: 700, padding: "2px 7px", borderRadius: "999px",
-          background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)",
-          color: "#34d399", letterSpacing: "0.03em",
-        }}>
-          ✓ On-chain
+      {/* Top row */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <ServiceMark id={svcId} size={40} radius={0} />
+        <span
+          style={{
+            fontFamily: "var(--font-geist-mono), monospace",
+            fontSize: 9.5,
+            color: accent ? "rgba(12,11,9,0.55)" : "var(--b-gold)",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            border: `1px solid ${accent ? "rgba(12,11,9,0.12)" : "rgba(201,162,79,0.28)"}`,
+            padding: "2px 7px",
+          }}
+        >
+          {category.label}
         </span>
       </div>
 
-      {/* Row 3: Members panel + Billing panel */}
-      <div style={{ display: "flex", gap: "8px" }}>
-        <div className="info-panel">
-          <p className="info-panel-label">Members</p>
-          <p className="info-panel-value">{pool.filledSlots} / {pool.maxSlots}</p>
-        </div>
-        <div className="info-panel">
-          <p className="info-panel-label">Billing</p>
-          <p className="info-panel-value">every {pool.cycleDays}d</p>
-        </div>
-        <div className="info-panel">
-          <p className="info-panel-label">Status</p>
-          <p className="info-panel-value" style={{ color: active ? "#34d399" : pending ? "#fbbf24" : "#64748b" }}>
-            {active ? "Active" : pending ? "Pending" : "Closed"}
-          </p>
-        </div>
+      {/* Name + host */}
+      <div>
+        <p
+          className="b-serif"
+          style={{
+            fontSize: 28,
+            lineHeight: 1.1,
+            color: accent ? "var(--b-ink)" : "var(--b-paper)",
+            marginBottom: 4,
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
+          {pool.title}
+        </p>
+        <p
+          style={{
+            fontFamily: "var(--font-geist-mono), monospace",
+            fontSize: 10.5,
+            color: accent ? "rgba(12,11,9,0.45)" : "var(--b-paper-40)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}
+        >
+          HOST · {pool.host.toBase58().slice(0, 4)}…{pool.host.toBase58().slice(-4)}
+        </p>
       </div>
 
-      {/* Row 4: price + savings + View button */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginTop: "2px" }}>
+      {/* Price + slots */}
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: "auto" }}>
         <div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: "5px" }}>
-            <span style={{ fontSize: "26px", fontWeight: 900, color: "white", lineHeight: 1 }}>
-              {formatUsdc(pool.pricePerSlot)}
-            </span>
-            <span style={{ fontSize: "12px", color: "var(--text-3)", fontWeight: 600 }}>USDC/mo</span>
-          </div>
+          <p
+            style={{
+              fontFamily: "var(--font-geist-mono), monospace",
+              fontSize: 9.5,
+              color: accent ? "rgba(12,11,9,0.45)" : "var(--b-paper-40)",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              marginBottom: 3,
+            }}
+          >
+            YOUR SHARE
+          </p>
+          <p
+            className="b-serif"
+            style={{ fontSize: 36, lineHeight: 1, color: accent ? "var(--b-ink)" : "var(--b-paper)" }}
+          >
+            {formatUsdc(pool.pricePerSlot)}
+          </p>
           {savings > 5 && (
-            <span style={{
-              fontSize: "11px", fontWeight: 700, marginTop: "3px", display: "inline-block",
-              padding: "2px 7px", borderRadius: "6px",
-              background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)",
-              color: "#34d399",
-            }}>
-              Save {savings}% vs ${retail}/mo retail
-            </span>
+            <p
+              style={{
+                fontFamily: "var(--font-geist-mono), monospace",
+                fontSize: 10,
+                color: accent ? "rgba(12,11,9,0.55)" : "var(--b-paper-40)",
+                marginTop: 3,
+              }}
+            >
+              VS RETAIL ${retail} · SAVE {savings}%
+            </p>
           )}
         </div>
-        <span className="btn-primary" style={{ padding: "9px 18px", fontSize: "13px", fontWeight: 700, borderRadius: "10px", flexShrink: 0 }}>
-          View →
-        </span>
+        <div style={{ textAlign: "right" }}>
+          <PoolSlots filled={pool.filledSlots} total={pool.maxSlots} size={14} gap={4} />
+          <p
+            style={{
+              fontFamily: "var(--font-geist-mono), monospace",
+              fontSize: 9.5,
+              color: accent ? "rgba(12,11,9,0.45)" : "var(--b-paper-40)",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              marginTop: 4,
+            }}
+          >
+            {slotsLeft > 0 && (active || pending)
+              ? `${slotsLeft} OPEN`
+              : active || pending ? "FULL" : "CLOSED"}
+          </p>
+        </div>
       </div>
     </Link>
   );
