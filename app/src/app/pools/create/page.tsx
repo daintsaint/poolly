@@ -9,6 +9,7 @@ import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token
 import { CATEGORIES, USDC_MINT_DEVNET } from "@/lib/constants";
 import { derivePoolPda, getProgram } from "@/lib/poolly-client";
 import { BNav, BTicker, BFooter } from "@/components/vault-ui";
+import { PricingOptimizer } from "@/components/pricing-optimizer";
 
 export default function CreatePoolPage() {
   const router = useRouter();
@@ -150,6 +151,15 @@ export default function CreatePoolPage() {
               />
             </Field>
           </div>
+
+          {/* AI Pricing Optimizer */}
+          <PricingOptimizer
+            category={form.category}
+            title={form.title}
+            maxSlots={parseInt(form.maxSlots) || 5}
+            cycleDays={parseInt(form.cycleDays) || 30}
+            onApply={(price) => update("pricePerSlot", price.toFixed(2))}
+          />
 
           {/* Slots */}
           <div className="grid grid-cols-2 gap-4">

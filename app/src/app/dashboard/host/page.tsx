@@ -2,6 +2,7 @@
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { BNav, BTicker, BFooter, ServiceMark, PoolSlots } from "@/components/vault-ui";
+import { DemandIntel } from "@/components/demand-intel";
 import Link from "next/link";
 
 /* ─── Static placeholder data ─── */
@@ -266,24 +267,16 @@ export default function HostDashboard() {
                 </div>
               </div>
 
-              {/* Next release countdown */}
+              {/* AI Demand Intel */}
               <div
                 style={{
-                  background: "linear-gradient(135deg, rgba(201,162,79,0.10) 0%, rgba(140,107,34,0.05) 100%)",
-                  border: "1px solid rgba(201,162,79,0.3)",
+                  background: "var(--b-ink-3)",
+                  border: "1px solid rgba(201,162,79,0.2)",
                   padding: "20px",
+                  flex: 1,
                 }}
               >
-                <p className="b-eyebrow" style={{ marginBottom: 12 }}>NEXT RELEASE</p>
-                <p className="b-serif" style={{ fontSize: 36, color: "var(--b-gold)", marginBottom: 6 }}>2d 14h 32m</p>
-                <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-paper-40)", letterSpacing: "0.10em", textTransform: "uppercase" }}>
-                  NETFLIX PREMIUM · $14.97 READY
-                </p>
-                <div style={{ borderTop: "1px solid rgba(201,162,79,0.2)", marginTop: 14, paddingTop: 14 }}>
-                  <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-paper-40)", letterSpacing: "0.08em" }}>
-                    SUBMIT PROOF TO UNLOCK FUNDS
-                  </p>
-                </div>
+                <DemandIntel />
               </div>
             </div>
           </div>

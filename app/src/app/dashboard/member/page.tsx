@@ -2,6 +2,7 @@
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { BNav, BTicker, BFooter, ServiceMark, Avatar, PoolSlots } from "@/components/vault-ui";
+import { BundleOptimizer } from "@/components/bundle-optimizer";
 
 /* ─── Static placeholder data ─── */
 const MY_POOLS = [
@@ -317,6 +318,52 @@ export default function MemberDashboard() {
             </div>
           ))}
         </div>
+
+        {/* ── AI Bundle Optimizer ── */}
+        <div style={{ marginTop: 64 }}>
+          <p className="b-eyebrow" style={{ marginBottom: 20 }}>SAVINGS INTELLIGENCE</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 1, alignItems: "start" }}>
+            {/* Left: optimizer */}
+            <BundleOptimizer />
+            {/* Right: explainer */}
+            <div
+              style={{
+                background: "var(--b-ink-3)",
+                border: "1px solid var(--b-rule)",
+                padding: "32px 28px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 24,
+              }}
+            >
+              <div>
+                <p className="b-eyebrow" style={{ marginBottom: 12 }}>HOW IT WORKS</p>
+                <p className="b-serif" style={{ fontSize: 28, lineHeight: 1.2, color: "var(--b-paper)" }}>
+                  AI scans market rates &amp; pool fill data to build your cheapest bundle.
+                </p>
+              </div>
+              {[
+                { n: "01", t: "Set your budget", d: "Tell us how much you want to spend per month on subscriptions." },
+                { n: "02", t: "Tag your services", d: "Mark which services you already pay for — AI prioritises those first." },
+                { n: "03", t: "Get your plan", d: "We return the optimal mix of Poolly pools that maximises your savings within budget." },
+              ].map((s) => (
+                <div key={s.n} style={{ display: "flex", gap: 14 }}>
+                  <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-gold)", letterSpacing: "0.14em", flexShrink: 0, marginTop: 2 }}>{s.n}</p>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: "var(--b-paper)", marginBottom: 4 }}>{s.t}</p>
+                    <p style={{ fontFamily: "var(--font-geist), sans-serif", fontSize: 12, color: "var(--b-paper-40)", lineHeight: 1.6 }}>{s.d}</p>
+                  </div>
+                </div>
+              ))}
+              <div style={{ borderTop: "1px solid var(--b-rule)", paddingTop: 16 }}>
+                <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-paper-40)", letterSpacing: "0.10em" }}>
+                  ✦ POWERED BY GROQ · LLAMA 3.3 70B · LIVE MARKET DATA
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <BFooter />
