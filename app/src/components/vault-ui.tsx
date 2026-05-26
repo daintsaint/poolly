@@ -8,21 +8,11 @@ import { PoollyLogo } from "@/components/PoollyLogo";
 /* ─────────────────────────────────────────────────────────
    ServiceMark
 ───────────────────────────────────────────────────────── */
-const SVC_GLYPHS: Record<string, string> = {
-  netflix: "N",
-  spotify: "♪",
-  disney: "D+",
-  icloud: "☁",
-  notion: "N",
-  ms365: "⊞",
-  hbo: "MAX",
-  adobe: "A",
-  peloton: "P",
-  nyt: "T",
-  chatgpt: "✦",
-  claude: "C",
-  nordvpn: "VPN",
-};
+const SVC_ICONS = new Set([
+  "netflix", "spotify", "disney", "hbo", "icloud",
+  "notion", "ms365", "adobe", "peloton", "nyt",
+  "chatgpt", "claude", "nordvpn",
+]);
 
 type ServiceMarkProps = {
   id: string;
@@ -31,26 +21,47 @@ type ServiceMarkProps = {
 };
 
 export function ServiceMark({ id, size = 40, radius = 0 }: ServiceMarkProps) {
-  const glyph = SVC_GLYPHS[id] ?? id.slice(0, 1).toUpperCase();
+  const hasIcon = SVC_ICONS.has(id);
+  if (hasIcon) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={`/svc/${id}.svg`}
+        alt={id}
+        width={size}
+        height={size}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: radius,
+          flexShrink: 0,
+          display: "block",
+        }}
+      />
+    );
+  }
+  // Fallback: initials in a neutral tile
+  const initials = id.slice(0, 2).toUpperCase();
   return (
     <div
-      className={`svc-${id}`}
       style={{
         width: size,
         height: size,
         borderRadius: radius,
+        background: "var(--b-ink-3)",
+        border: "1px solid var(--b-rule)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontFamily: "var(--font-newsreader), Georgia, serif",
+        fontFamily: "var(--font-geist-mono), monospace",
         fontWeight: 700,
-        fontSize: size * 0.38,
-        letterSpacing: "-0.02em",
+        fontSize: size * 0.3,
+        color: "var(--b-paper-40)",
         flexShrink: 0,
         userSelect: "none",
       }}
     >
-      {glyph}
+      {initials}
     </div>
   );
 }
