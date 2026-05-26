@@ -8,6 +8,8 @@
  */
 
 import { Redis } from "@upstash/redis";
+import { type NextRequest } from "next/server";
+import { profileLimiter, getIp } from "@/lib/ratelimit";
 
 /* ── Redis client (lazy — only instantiated when env vars are present) ── */
 function getRedis(): Redis | null {
@@ -22,7 +24,7 @@ const localStore = new Map<string, string>();
 
 const KEY = (wallet: string) => `dn:${wallet}`;
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const wallet = searchParams.get("wallet")?.trim();
   if (!wallet) {
@@ -37,7 +39,12 @@ export async function GET(request: Request) {
   return Response.json({ displayName: displayName ?? null });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const { success } = await profileLimiter.limit(getIp(request));
+  if (!success) {
+    return Response.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const body = (await request.json()) as { wallet?: string; displayName?: string };
   const wallet = body.wallet?.trim();
   const displayName = body.displayName?.trim().slice(0, 32);

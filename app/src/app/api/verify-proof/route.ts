@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { NextRequest, NextResponse } from "next/server";
+import { aiLimiter, getIp } from "@/lib/ratelimit";
 
 const CATEGORY_HINTS: Record<number, string> = {
   0: "streaming service (Netflix, Spotify, Disney+, etc.) — look for account page, subscription plan, active status, and member slots",
@@ -19,6 +20,11 @@ export interface VerifyResult {
 }
 
 export async function POST(req: NextRequest) {
+  const { success } = await aiLimiter.limit(getIp(req));
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   try {
     const { proofUrl, poolTitle, category } = await req.json();
 

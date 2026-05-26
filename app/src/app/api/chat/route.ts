@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import { NextRequest } from "next/server";
+import { aiLimiter, getIp } from "@/lib/ratelimit";
 
 let groq: Groq | null = null;
 function getGroq(): Groq {
@@ -31,6 +32,13 @@ Common retail prices (monthly):
 - Figma Professional: $15/editor/mo`;
 
 export async function POST(req: NextRequest) {
+  const { success } = await aiLimiter.limit(getIp(req));
+  if (!success) {
+    return new Response(JSON.stringify({ error: "Too many requests" }), {
+      status: 429, headers: { "Content-Type": "application/json" },
+    });
+  }
+
   if (!process.env.GROQ_API_KEY) {
     return new Response(
       JSON.stringify({ error: "AI not configured" }),

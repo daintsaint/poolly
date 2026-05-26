@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
+import { NextRequest } from "next/server";
+import { aiLimiter, getIp } from "@/lib/ratelimit";
 
 let cached: { data: unknown; ts: number } | null = null;
 const TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const { success } = await aiLimiter.limit(getIp(req));
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
   try {
     const now = Date.now();
     if (cached && now - cached.ts < TTL_MS) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
+import { aiLimiter, getIp } from "@/lib/ratelimit";
 
 const SERVICE_REFERENCE = `
 Netflix Premium    $22.99 retail → Poolly ~$4.99/slot
@@ -14,6 +15,11 @@ ChatGPT Plus       $20.00 retail → Poolly ~$4.99/slot
 `.trim();
 
 export async function POST(req: NextRequest) {
+  const { success } = await aiLimiter.limit(getIp(req));
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   try {
     const body = await req.json();
     const { budget, services } = body as {
