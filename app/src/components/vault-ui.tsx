@@ -170,7 +170,7 @@ const TICKER_ITEMS = [
   { label: "POOLLY", value: "SMARTER POOLING" },
   { label: "LIVE POOLS", value: "1,284" },
   { label: "MEMBERS", value: "5,917" },
-  { label: "IN ESCROW", value: "$184,920" },
+  { label: "IN ESCROW", value: "$1.84M" },
   { label: "AVG. CYCLE", value: "$4.96/mo" },
   { label: "NETWORK", value: "SOL · 412 MS" },
 ];
