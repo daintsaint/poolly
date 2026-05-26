@@ -47,8 +47,11 @@ export default function AdminPaymentsPage() {
         const nextCharge = pool.nextChargeAt.toNumber();
         const cycleSecs = pool.cycleDays * 86400;
 
+        const createdAt = pool.createdAt.toNumber();
         for (let i = 0; i < pool.totalCycles; i++) {
           const ts = nextCharge - (pool.totalCycles - i) * cycleSecs;
+          // Skip reconstructed dates that fall before the pool existed
+          if (ts < createdAt) continue;
           result.push({
             date: ts,
             poolTitle: pool.title,
