@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
 import { AnchorProvider, BN } from "@coral-xyz/anchor";
 import { SystemProgram } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { CATEGORIES, USDC_MINT_DEVNET } from "@/lib/constants";
 import { derivePoolPda, getProgram } from "@/lib/poolly-client";
 import { BNav, BTicker, BFooter } from "@/components/vault-ui";
@@ -43,6 +43,9 @@ export default function CreatePoolPage() {
 
       const priceInMicroUsdc = Math.round(parseFloat(form.pricePerSlot) * 1_000_000);
 
+      const poolPda = derivePoolPda(wallet.publicKey, form.title);
+      const escrowToken = getAssociatedTokenAddressSync(USDC_MINT_DEVNET, poolPda, true);
+
       await program.methods
         .createPool({
           title: form.title,
@@ -52,16 +55,17 @@ export default function CreatePoolPage() {
           minSlots: parseInt(form.minSlots),
           cycleDays: parseInt(form.cycleDays),
         })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .accounts({
           host: wallet.publicKey,
           mint: USDC_MINT_DEVNET,
+          pool: poolPda,
+          escrowToken,
           tokenProgram: TOKEN_PROGRAM_ID,
           associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
-        })
+        } as any)
         .rpc();
-
-      const poolPda = derivePoolPda(wallet.publicKey, form.title);
       router.push(`/pools/${poolPda.toBase58()}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Transaction failed");

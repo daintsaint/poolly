@@ -15,6 +15,7 @@ import {
   formatUsdc,
   isPoolActive,
   isPoolPending,
+  deriveMemberPda,
   type PoolAccount,
 } from "@/lib/poolly-client";
 import { CATEGORIES, PLATFORM_WALLET } from "@/lib/constants";
@@ -104,14 +105,16 @@ export default function PoolDetailPage() {
       const program = getProgram(provider);
       const memberToken = getAssociatedTokenAddressSync(pool.mint, wallet.publicKey);
       const escrowToken = getAssociatedTokenAddressSync(pool.mint, pool.publicKey, true);
+      const memberRecord = deriveMemberPda(pool.publicKey, wallet.publicKey);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sig = await program.methods.joinPool().accounts({
         pool: pool.publicKey, member: wallet.publicKey,
-        memberToken, escrowToken,
+        memberToken, escrowToken, memberRecord,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-      }).rpc();
+      } as any).rpc();
 
       setJoinTx(sig);
       setJoinStep("success");
