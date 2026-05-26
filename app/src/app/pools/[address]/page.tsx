@@ -51,6 +51,7 @@ function MemberRow({ m }: { m: MemberRowData }) {
         borderBottom: "1px solid var(--b-rule)",
         padding: "14px 16px",
         alignItems: "center",
+        minWidth: 480,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -362,10 +363,10 @@ export default function PoolDetailPage() {
 
       {/* ── Breadcrumb ── */}
       <div
+        className="page-x"
         style={{
           borderBottom: "1px solid var(--b-rule)",
           background: "var(--b-ink-2)",
-          padding: "0 40px",
         }}
       >
         <div
@@ -420,12 +421,12 @@ export default function PoolDetailPage() {
 
       {/* ── Main layout ── */}
       <div
+        className="page-x grid-2-sidebar"
         style={{
           maxWidth: 1200,
           margin: "0 auto",
-          padding: "40px 40px 80px",
-          display: "grid",
-          gridTemplateColumns: "1.5fr 1fr",
+          paddingTop: 40,
+          paddingBottom: 80,
           gap: 40,
           alignItems: "start",
         }}
@@ -440,7 +441,7 @@ export default function PoolDetailPage() {
               <p className="b-eyebrow" style={{ marginBottom: 8 }}>{category.label} · {addrShort}</p>
               <h1
                 className="b-serif"
-                style={{ fontSize: 88, lineHeight: 0.9, color: "var(--b-paper)", letterSpacing: "-0.03em" }}
+                style={{ fontSize: "clamp(36px, 8vw, 88px)", lineHeight: 0.9, color: "var(--b-paper)", letterSpacing: "-0.03em" }}
               >
                 {pool.title}
               </h1>
@@ -994,7 +995,7 @@ export default function PoolDetailPage() {
 
             {/* Members tab */}
             {activeTab === "Members" && (
-              <div style={{ marginTop: 0 }}>
+              <div className="table-scroll" style={{ marginTop: 0 }}>
                 {/* Header */}
                 <div
                   style={{
@@ -1003,6 +1004,7 @@ export default function PoolDetailPage() {
                     gap: 0,
                     borderBottom: "1px solid var(--b-rule)",
                     padding: "10px 16px",
+                    minWidth: 480,
                   }}
                 >
                   {["MEMBER", "JOINED", "PAID", "STATUS", "TX"].map((h) => (

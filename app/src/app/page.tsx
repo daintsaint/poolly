@@ -152,7 +152,7 @@ export default function Home() {
 
       {/* ── HERO ─────────────────────────────────────── */}
       <section style={{ background: "var(--b-ink)", paddingTop: 96, paddingBottom: 80 }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 40px", textAlign: "center" }}>
+        <div className="page-x" style={{ maxWidth: 1100, margin: "0 auto", textAlign: "center" }}>
 
           {/* Eyebrow */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, marginBottom: 32 }}>
@@ -243,7 +243,7 @@ export default function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4,1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
               gap: 0,
               borderTop: "1px solid var(--b-rule)",
               marginTop: 56,
@@ -277,8 +277,8 @@ export default function Home() {
       </section>
 
       {/* ── MECHANISM ──────────────────────────────────── */}
-      <section id="mechanism" style={{ background: "var(--b-ink)", padding: "96px 40px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <section id="mechanism" style={{ background: "var(--b-ink)", padding: "clamp(3rem, 8vw, 96px) 0" }}>
+        <div className="page-x" style={{ maxWidth: 1100, margin: "0 auto" }}>
           <p className="b-eyebrow" style={{ marginBottom: 20 }}>I. THE MECHANISM</p>
           <h2
             className="b-serif"
@@ -288,7 +288,7 @@ export default function Home() {
             <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>one ledger.</em>
           </h2>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 0 }}>
+          <div className="grid-3" style={{ gap: 0 }}>
             {[
               {
                 num: "I.",
@@ -361,8 +361,8 @@ export default function Home() {
       </section>
 
       {/* ── CATALOG PREVIEW ─────────────────────────────── */}
-      <section style={{ background: "var(--b-ink-2)", padding: "96px 40px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <section style={{ background: "var(--b-ink-2)", padding: "clamp(3rem, 8vw, 96px) 0" }}>
+        <div className="page-x" style={{ maxWidth: 1100, margin: "0 auto" }}>
           <p className="b-eyebrow" style={{ marginBottom: 20 }}>II. THE CATALOG</p>
           <h2
             className="b-serif"
@@ -372,12 +372,12 @@ export default function Home() {
             <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>curated weekly.</em>
           </h2>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, marginBottom: 2 }}>
+          <div className="pool-grid" style={{ marginBottom: 2 }}>
             {CATALOG_ROW_1.map((item) => (
               <BCatalogCard key={item.id} item={item} accent={item.accent} />
             ))}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1 }}>
+          <div className="pool-grid">
             {CATALOG_ROW_2.map((item) => (
               <BCatalogCard key={item.id} item={item} />
             ))}
@@ -409,8 +409,8 @@ export default function Home() {
       </section>
 
       {/* ── MATH TABLE ─────────────────────────────────── */}
-      <section style={{ background: "var(--b-ink)", padding: "96px 40px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <section style={{ background: "var(--b-ink)", padding: "clamp(3rem, 8vw, 96px) 0" }}>
+        <div className="page-x" style={{ maxWidth: 1100, margin: "0 auto" }}>
           <p className="b-eyebrow" style={{ marginBottom: 20 }}>III. THE MATH</p>
           <h2
             className="b-serif"
@@ -513,8 +513,8 @@ export default function Home() {
       </section>
 
       {/* ── LEDGER ─────────────────────────────────────── */}
-      <section style={{ background: "var(--b-ink-2)", padding: "96px 40px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <section style={{ background: "var(--b-ink-2)", padding: "clamp(3rem, 8vw, 96px) 0" }}>
+        <div className="page-x" style={{ maxWidth: 1100, margin: "0 auto" }}>
           <p className="b-eyebrow" style={{ marginBottom: 20 }}>IV. THE LEDGER · LIVE</p>
           <h2
             className="b-serif"
@@ -622,8 +622,8 @@ export default function Home() {
       </section>
 
       {/* ── MANIFESTO ──────────────────────────────────── */}
-      <section style={{ background: "var(--b-ink)", padding: "120px 40px", textAlign: "center" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+      <section style={{ background: "var(--b-ink)", padding: "clamp(3rem, 10vw, 120px) 0", textAlign: "center" }}>
+        <div className="page-x" style={{ maxWidth: 900, margin: "0 auto" }}>
           <p
             className="b-serif"
             style={{
@@ -653,8 +653,8 @@ export default function Home() {
       </section>
 
       {/* ── AI INTELLIGENCE ─────────────────────────────── */}
-      <section style={{ background: "var(--b-ink-2)", padding: "96px 40px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <section style={{ background: "var(--b-ink-2)", padding: "clamp(3rem, 8vw, 96px) 0" }}>
+        <div className="page-x" style={{ maxWidth: 1100, margin: "0 auto" }}>
           <p className="b-eyebrow" style={{ marginBottom: 20 }}>V. THE INTELLIGENCE</p>
           <h2
             className="b-serif"
@@ -676,7 +676,7 @@ export default function Home() {
             Groq-powered AI scans live market data to build your cheapest subscription stack — and shows hosts where demand is highest.
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, alignItems: "start" }}>
+          <div className="grid-2" style={{ alignItems: "start" }}>
             {/* Bundle Optimizer */}
             <BundleOptimizer />
 

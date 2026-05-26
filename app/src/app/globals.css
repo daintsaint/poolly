@@ -245,6 +245,56 @@ body {
 .savings-bar-fill-pool   { height: 100%; background: var(--b-gold); display: flex; align-items: center; padding: 0 8px; }
 .savings-bar-amount { font-size: 11px; font-weight: 700; color: var(--b-ink); white-space: nowrap; }
 
+/* ────────────────────────────────────────────────────────
+   Responsive utilities
+   ──────────────────────────────────────────────────────── */
+
+/* Page-level horizontal padding — shrinks gracefully on mobile */
+.page-x { padding-left: clamp(1rem, 5vw, 2.5rem); padding-right: clamp(1rem, 5vw, 2.5rem); }
+
+/* Pool catalog grid: 4 cols desktop → 2 cols tablet → 1 col mobile */
+.pool-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+}
+@media (max-width: 1024px) { .pool-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px)  { .pool-grid { grid-template-columns: 1fr; } }
+
+/* 3-col → 1-col stacker (mechanism / how-it-works sections) */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
+@media (max-width: 768px) { .grid-3 { grid-template-columns: 1fr; } }
+
+/* 2-col → 1-col stacker (detail page sidebar) */
+.grid-2-sidebar {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 860px) { .grid-2-sidebar { grid-template-columns: 1fr; } }
+
+/* 2-col equal (AI features, etc.) */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; }
+@media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* Stats bar: 4-col → 2-col on mobile */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 640px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+
+/* Footer grid: 5-col → 2-col → 1-col */
+.footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr; gap: 32px; }
+@media (max-width: 860px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; } }
+@media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; gap: 20px; } }
+
+/* Horizontal scroll wrapper for dense tables on mobile */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Hide table columns on mobile that are non-critical */
+@media (max-width: 600px) {
+  .col-hide-mobile { display: none; }
+}
+
 /* ── Service badge (legacy) ── */
 .service-badge {
   display: inline-flex;

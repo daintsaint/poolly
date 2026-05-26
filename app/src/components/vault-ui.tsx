@@ -362,15 +362,15 @@ export function BNav() {
       }}
     >
       <div
+        className="page-x"
         style={{
           maxWidth: 1200,
           margin: "0 auto",
-          padding: "0 40px",
           height: 64,
           display: "grid",
           gridTemplateColumns: "1fr auto 1fr",
           alignItems: "center",
-          gap: 32,
+          gap: "clamp(8px, 3vw, 32px)",
         }}
       >
         {/* Left: wordmark */}
@@ -653,9 +653,9 @@ export function BFooter() {
 
   return (
     <footer style={{ background: "var(--b-ink-2)", borderTop: "1px solid var(--b-rule)" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "56px 40px 32px" }}>
+      <div className="page-x" style={{ maxWidth: 1200, margin: "0 auto", paddingTop: "clamp(2rem, 5vw, 56px)", paddingBottom: 32 }}>
         {/* Top: wordmark + link columns */}
-        <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1fr 1fr", gap: 48, marginBottom: 48 }}>
+        <div className="footer-grid" style={{ marginBottom: 48 }}>
           {/* Wordmark */}
           <div>
             <PoollyLogo variant="stacked" size={48} onDark style={{ marginBottom: 16 }} />
