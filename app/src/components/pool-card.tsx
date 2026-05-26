@@ -4,6 +4,8 @@ import Link from "next/link";
 import { CATEGORIES } from "@/lib/constants";
 import { formatUsdc, isPoolActive, isPoolPending, type PoolAccount } from "@/lib/poolly-client";
 import { ServiceMark, PoolSlots } from "@/components/vault-ui";
+import { titleToSvcId } from "@/lib/svc-utils";
+import { useDisplayName, shortWallet } from "@/lib/use-display-name";
 
 const CATEGORY_RETAIL: Record<number, number> = {
   0: 22,
@@ -14,20 +16,13 @@ const CATEGORY_RETAIL: Record<number, number> = {
   5: 20,
 };
 
-const CAT_TO_SVC: Record<number, string> = {
-  0: "netflix",
-  1: "ms365",
-  2: "peloton",
-  3: "disney",
-  4: "adobe",
-  5: "chatgpt",
-};
-
 type Props = { pool: PoolAccount; accent?: boolean };
 
 export function PoolCard({ pool, accent = false }: Props) {
   const category  = CATEGORIES.find((c) => c.id === pool.category) ?? CATEGORIES[5];
-  const svcId     = CAT_TO_SVC[pool.category] ?? "chatgpt";
+  const svcId     = titleToSvcId(pool.title, pool.category);
+  const hostWallet = pool.host.toBase58();
+  const hostName   = useDisplayName(hostWallet);
   const slotsLeft = pool.maxSlots - pool.filledSlots;
   const active    = isPoolActive(pool);
   const pending   = isPoolPending(pool);
@@ -94,7 +89,7 @@ export function PoolCard({ pool, accent = false }: Props) {
             textTransform: "uppercase",
           }}
         >
-          HOST · {pool.host.toBase58().slice(0, 4)}…{pool.host.toBase58().slice(-4)}
+          HOST · {hostName ?? shortWallet(hostWallet)}
         </p>
       </div>
 

@@ -3,6 +3,26 @@
 import { useAdminData } from "@/lib/use-admin-data";
 import { CATEGORIES } from "@/lib/constants";
 import { isPoolActive, isPoolPending } from "@/lib/poolly-client";
+import { ServiceMark } from "@/components/vault-ui";
+import { titleToSvcId } from "@/lib/svc-utils";
+import { useDisplayName, shortWallet } from "@/lib/use-display-name";
+
+function AdminHostCell({ wallet }: { wallet: string }) {
+  const name = useDisplayName(wallet);
+  return (
+    <td
+      style={{
+        padding: "10px 12px",
+        borderBottom: "1px solid var(--b-rule)",
+        color: "rgba(237,230,214,0.5)",
+        fontFamily: "var(--font-geist-mono), monospace",
+        fontSize: 11,
+      }}
+    >
+      {name ?? shortWallet(wallet)}
+    </td>
+  );
+}
 
 function Skeleton({ width = "100%", height = 20 }: { width?: string | number; height?: number }) {
   return (
@@ -510,6 +530,7 @@ export default function AdminOverviewPage() {
                     day: "numeric",
                     year: "numeric",
                   });
+                  const svcId = titleToSvcId(pool.title, pool.category);
                   return (
                     <tr key={pool.publicKey.toString()}>
                       <td
@@ -517,25 +538,18 @@ export default function AdminOverviewPage() {
                           padding: "10px 12px",
                           borderBottom: "1px solid var(--b-rule)",
                           color: "var(--b-paper)",
-                          maxWidth: 180,
+                          maxWidth: 200,
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {pool.title}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <ServiceMark id={svcId} size={18} radius={0} />
+                          <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{pool.title}</span>
+                        </div>
                       </td>
-                      <td
-                        style={{
-                          padding: "10px 12px",
-                          borderBottom: "1px solid var(--b-rule)",
-                          color: "rgba(237,230,214,0.5)",
-                          fontFamily: "var(--font-geist-mono), monospace",
-                          fontSize: 11,
-                        }}
-                      >
-                        {truncate(pool.host.toString())}
-                      </td>
+                      <AdminHostCell wallet={pool.host.toString()} />
                       <td
                         style={{
                           padding: "10px 12px",

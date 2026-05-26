@@ -4,9 +4,31 @@ import { useState, useMemo } from "react";
 import { useAdminData } from "@/lib/use-admin-data";
 import { CATEGORIES } from "@/lib/constants";
 import { isPoolActive, isPoolPending, type PoolAccount } from "@/lib/poolly-client";
+import { ServiceMark } from "@/components/vault-ui";
+import { titleToSvcId } from "@/lib/svc-utils";
+import { useDisplayName, shortWallet } from "@/lib/use-display-name";
 
-function truncate(addr: string) {
-  return addr.slice(0, 4) + "…" + addr.slice(-4);
+/** Isolated so useDisplayName can be called per row */
+function HostCell({ wallet }: { wallet: string }) {
+  const name = useDisplayName(wallet);
+  const display = name ?? shortWallet(wallet);
+  return (
+    <td
+      style={{
+        padding: "9px 10px",
+        borderBottom: "1px solid var(--b-rule)",
+        color: "rgba(237,230,214,0.7)",
+        fontFamily: "var(--font-geist-mono), monospace",
+        fontSize: 11,
+        whiteSpace: "nowrap",
+        cursor: "pointer",
+      }}
+      title={wallet}
+      onClick={() => navigator.clipboard.writeText(wallet)}
+    >
+      {display}
+    </td>
+  );
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -345,6 +367,7 @@ export default function AdminPoolsPage() {
                   const catLabel =
                     CATEGORIES.find((c) => c.id === pool.category)?.label ?? "—";
                   const hostStr = pool.host.toString();
+                  const svcId = titleToSvcId(pool.title, pool.category);
 
                   return (
                     <tr key={pool.publicKey.toString()}>
@@ -357,20 +380,17 @@ export default function AdminPoolsPage() {
                           color: "var(--b-paper)",
                           fontFamily: "var(--font-geist), sans-serif",
                           fontSize: 13,
-                          maxWidth: 180,
+                          maxWidth: 200,
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                         }}
                       >
-                        {pool.title}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <ServiceMark id={svcId} size={20} radius={0} />
+                          <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{pool.title}</span>
+                        </div>
                       </td>
-                      <td
-                        style={{ ...tdStyle, cursor: "pointer" }}
-                        title={hostStr}
-                        onClick={() => navigator.clipboard.writeText(hostStr)}
-                      >
-                        {truncate(hostStr)}
-                      </td>
+                      <HostCell wallet={hostStr} />
                       <td style={tdStyle}>{catLabel}</td>
                       <td style={tdStyle}>
                         <StatusBadge status={statusKey} />

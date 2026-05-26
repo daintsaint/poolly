@@ -3,9 +3,31 @@
 import { useState, useMemo } from "react";
 import { useAdminData } from "@/lib/use-admin-data";
 import { isPoolActive } from "@/lib/poolly-client";
+import { useDisplayName, shortWallet } from "@/lib/use-display-name";
 
 function truncate(addr: string) {
-  return addr.slice(0, 4) + "…" + addr.slice(-4);
+  return shortWallet(addr);
+}
+
+function WalletCell({ wallet }: { wallet: string }) {
+  const name = useDisplayName(wallet);
+  return (
+    <td
+      style={{
+        padding: "9px 10px",
+        borderBottom: "1px solid var(--b-rule)",
+        color: "rgba(237,230,214,0.7)",
+        fontFamily: "var(--font-geist-mono), monospace",
+        fontSize: 11,
+        whiteSpace: "nowrap",
+        cursor: "pointer",
+      }}
+      title={wallet}
+      onClick={() => navigator.clipboard.writeText(wallet)}
+    >
+      {name ?? shortWallet(wallet)}
+    </td>
+  );
 }
 
 type RoleFilter = "ALL" | "HOSTS" | "MEMBERS";
@@ -260,13 +282,7 @@ export default function AdminUsersPage() {
 
                   return (
                     <tr key={u.wallet}>
-                      <td
-                        style={{ ...tdStyle, cursor: "pointer" }}
-                        title={u.wallet}
-                        onClick={() => navigator.clipboard.writeText(u.wallet)}
-                      >
-                        {truncate(u.wallet)}
-                      </td>
+                      <WalletCell wallet={u.wallet} />
                       <td style={tdStyle}>
                         <div style={{ display: "flex", gap: 4 }}>
                           {roles.map((r) => (

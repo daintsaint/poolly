@@ -23,19 +23,76 @@ import {
 import { CATEGORIES, PLATFORM_WALLET } from "@/lib/constants";
 import { ProofVerifier } from "@/components/proof-verifier";
 import { BNav, BTicker, BFooter, ServiceMark, Avatar, PoolSlots } from "@/components/vault-ui";
+import { titleToSvcId } from "@/lib/svc-utils";
+import { useDisplayName, saveDisplayName, shortWallet } from "@/lib/use-display-name";
 import Link from "next/link";
 
-/* ─── Derive service id from category ─── */
-const CAT_TO_SVC: Record<number, string> = {
-  0: "netflix",
-  1: "ms365",
-  2: "peloton",
-  3: "disney",
-  4: "adobe",
-  5: "chatgpt",
+type JoinStep = "idle" | "confirm" | "pending" | "success";
+
+/* ── MemberRow: isolated so useDisplayName can be called per row ── */
+type MemberRowData = {
+  key: string;
+  walletStr: string;
+  role: string;
+  joined: string;
+  paid: string;
+  walletPk: { toBase58(): string };
 };
 
-type JoinStep = "idle" | "confirm" | "pending" | "success";
+function MemberRow({ m }: { m: MemberRowData }) {
+  const displayName = useDisplayName(m.walletStr);
+  const handle = displayName ?? shortWallet(m.walletStr);
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "2fr 0.8fr 0.8fr 0.8fr 0.6fr",
+        gap: 0,
+        borderBottom: "1px solid var(--b-rule)",
+        padding: "14px 16px",
+        alignItems: "center",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <Avatar name={handle} size={28} />
+        <div>
+          <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper)", letterSpacing: "0.04em" }}>
+            {handle}
+          </p>
+          <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 9, color: m.role === "HOST" ? "var(--b-gold)" : "var(--b-paper-40)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            {m.role}
+          </p>
+        </div>
+      </div>
+      <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)" }}>{m.joined}</p>
+      <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper)" }}>{m.paid}</p>
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          padding: "2px 7px",
+          border: "1px solid rgba(92,135,112,0.35)",
+          fontFamily: "var(--font-geist-mono), monospace",
+          fontSize: 9,
+          color: "var(--b-emerald)",
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          width: "fit-content",
+        }}
+      >
+        ACTIVE
+      </span>
+      <a
+        href={`https://solscan.io/address/${m.walletPk.toBase58()}?cluster=devnet`}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-gold)", textDecoration: "none" }}
+      >
+        ↗
+      </a>
+    </div>
+  );
+}
 
 export default function PoolDetailPage() {
   const { address } = useParams<{ address: string }>();
@@ -64,6 +121,11 @@ export default function PoolDetailPage() {
   const [hostSuccess, setHostSuccess] = useState("");
   const [confirmClose, setConfirmClose] = useState(false);
   const [activeTab, setActiveTab] = useState("Members");
+
+  // Display name
+  const [nameInput, setNameInput] = useState("");
+  const [nameSaving, setNameSaving] = useState(false);
+  const [nameSaved, setNameSaved] = useState(false);
 
   const loadPool = useCallback(async () => {
     try {
@@ -233,7 +295,7 @@ export default function PoolDetailPage() {
   }
 
   const category   = CATEGORIES.find((c) => c.id === pool.category) ?? CATEGORIES[5];
-  const svcId      = CAT_TO_SVC[pool.category] ?? "chatgpt";
+  const svcId      = titleToSvcId(pool.title, pool.category);
   const fillPct    = Math.round((pool.filledSlots / pool.maxSlots) * 100);
   const isHost     = publicKey?.toBase58() === pool.host.toBase58();
   const active     = isPoolActive(pool);
@@ -242,7 +304,10 @@ export default function PoolDetailPage() {
   const closed     = !active && !pending;
   const hostAmount = escrowBalance ? (escrowBalance * 0.94).toFixed(2) : "—";
   const addrShort  = `${address.slice(0, 4)}…${address.slice(-4)}`;
-  const hostShort  = `${pool.host.toBase58().slice(0, 4)}…${pool.host.toBase58().slice(-4)}`;
+  const hostWalletStr = pool.host.toBase58();
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const hostDisplayName = useDisplayName(hostWalletStr);
+  const hostShort  = hostDisplayName ?? shortWallet(hostWalletStr);
   const isFull     = pool.filledSlots >= pool.maxSlots;
   const priceNum   = pool.pricePerSlot / 1_000_000; // lamports → USDC
   const hasEnoughUsdc = usdcBalance !== null ? usdcBalance >= priceNum : true;
@@ -260,7 +325,8 @@ export default function PoolDetailPage() {
 
   const realRows = members.map((m) => ({
     key: m.publicKey.toBase58(),
-    handle: shortKey(m.wallet),
+    walletStr: m.wallet.toBase58(),
+    handle: shortKey(m.wallet), // will be overridden by display name in render
     role: m.wallet.toBase58() === pool.host.toBase58() ? "HOST" : "MEMBER",
     joined: fmtDate(m.joinedAt),
     paid: formatUsdc(pool.pricePerSlot),
@@ -952,55 +1018,7 @@ export default function PoolDetailPage() {
 
                 {/* Real member rows */}
                 {realRows.map((m) => (
-                  <div
-                    key={m.key}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "2fr 0.8fr 0.8fr 0.8fr 0.6fr",
-                      gap: 0,
-                      borderBottom: "1px solid var(--b-rule)",
-                      padding: "14px 16px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <Avatar name={m.handle} size={28} />
-                      <div>
-                        <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper)", letterSpacing: "0.04em" }}>
-                          {m.handle}
-                        </p>
-                        <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 9, color: m.role === "HOST" ? "var(--b-gold)" : "var(--b-paper-40)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                          {m.role}
-                        </p>
-                      </div>
-                    </div>
-                    <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)" }}>{m.joined}</p>
-                    <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper)" }}>{m.paid}</p>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        padding: "2px 7px",
-                        border: "1px solid rgba(92,135,112,0.35)",
-                        fontFamily: "var(--font-geist-mono), monospace",
-                        fontSize: 9,
-                        color: "var(--b-emerald)",
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                        width: "fit-content",
-                      }}
-                    >
-                      ACTIVE
-                    </span>
-                    <a
-                      href={`https://solscan.io/address/${m.walletPk.toBase58()}?cluster=devnet`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-gold)", textDecoration: "none" }}
-                    >
-                      ↗
-                    </a>
-                  </div>
+                  <MemberRow key={m.key} m={m} />
                 ))}
 
                 {/* Open seat rows */}
@@ -1271,6 +1289,60 @@ export default function PoolDetailPage() {
               &ldquo;I&apos;ve been running this plan for {pool.totalCycles > 0 ? pool.totalCycles : 1} cycle{pool.totalCycles !== 1 ? "s" : ""} — on-time delivery every time.&rdquo;
             </p>
           </div>
+
+          {/* Your display name — shown when wallet is connected */}
+          {publicKey && (
+            <div style={{ border: "1px solid var(--b-rule)", background: "var(--b-ink-3)", padding: "18px 20px" }}>
+              <p className="b-eyebrow" style={{ marginBottom: 10 }}>YOUR NAME</p>
+              <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 9.5, color: "var(--b-paper-40)", marginBottom: 10, letterSpacing: "0.08em" }}>
+                Set a display name so other members see you as more than a wallet address.
+              </p>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  value={nameInput}
+                  onChange={(e) => { setNameInput(e.target.value); setNameSaved(false); }}
+                  placeholder={shortWallet(publicKey.toBase58())}
+                  maxLength={32}
+                  style={{
+                    flex: 1,
+                    background: "var(--b-ink)",
+                    border: "1px solid var(--b-rule)",
+                    color: "var(--b-paper)",
+                    fontFamily: "var(--font-geist-mono), monospace",
+                    fontSize: 11,
+                    padding: "7px 10px",
+                    outline: "none",
+                    letterSpacing: "0.04em",
+                  }}
+                />
+                <button
+                  disabled={!nameInput.trim() || nameSaving}
+                  onClick={async () => {
+                    if (!nameInput.trim()) return;
+                    setNameSaving(true);
+                    await saveDisplayName(publicKey.toBase58(), nameInput.trim());
+                    setNameSaving(false);
+                    setNameSaved(true);
+                    setTimeout(() => setNameSaved(false), 3000);
+                  }}
+                  style={{
+                    background: nameSaved ? "var(--b-emerald)" : "var(--b-gold)",
+                    color: "var(--b-ink)",
+                    border: "none",
+                    fontFamily: "var(--font-geist-mono), monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    padding: "7px 14px",
+                    cursor: "pointer",
+                    opacity: !nameInput.trim() || nameSaving ? 0.5 : 1,
+                  }}
+                >
+                  {nameSaved ? "SAVED ✓" : nameSaving ? "…" : "SAVE"}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Status badge */}
           <div
