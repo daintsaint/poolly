@@ -18,7 +18,7 @@ export type Poolly = {
     },
     {
       name: "joinPool";
-      discriminator: [76, 51, 204, 168, 60, 114, 145, 60];
+      discriminator: [14, 65, 62, 16, 116, 17, 195, 107];
       accounts: [
         { name: "member"; writable: true; signer: true },
         { name: "pool"; writable: true },
@@ -33,7 +33,7 @@ export type Poolly = {
     },
     {
       name: "releaseFunds";
-      discriminator: [186, 111, 226, 130, 97, 120, 31, 141];
+      discriminator: [225, 88, 91, 108, 126, 52, 2, 26];
       accounts: [
         { name: "host"; signer: true },
         { name: "pool"; writable: true },
@@ -46,7 +46,7 @@ export type Poolly = {
     },
     {
       name: "submitProof";
-      discriminator: [196, 130, 22, 16, 244, 56, 249, 133];
+      discriminator: [54, 241, 46, 84, 4, 212, 46, 94];
       accounts: [
         { name: "host"; signer: true },
         { name: "pool"; writable: true }
@@ -73,7 +73,7 @@ export type Poolly = {
     },
     {
       name: "memberRecord";
-      discriminator: [12, 166, 195, 0, 252, 242, 91, 239];
+      discriminator: [26, 35, 161, 83, 248, 8, 189, 249];
     }
   ];
   types: [
@@ -169,7 +169,7 @@ export const IDL: Poolly = {
     },
     {
       name: "joinPool",
-      discriminator: [76, 51, 204, 168, 60, 114, 145, 60],
+      discriminator: [14, 65, 62, 16, 116, 17, 195, 107],
       accounts: [
         { name: "member", writable: true, signer: true },
         { name: "pool", writable: true },
@@ -184,7 +184,7 @@ export const IDL: Poolly = {
     },
     {
       name: "releaseFunds",
-      discriminator: [186, 111, 226, 130, 97, 120, 31, 141],
+      discriminator: [225, 88, 91, 108, 126, 52, 2, 26],
       accounts: [
         { name: "host", signer: true },
         { name: "pool", writable: true },
@@ -197,7 +197,7 @@ export const IDL: Poolly = {
     },
     {
       name: "submitProof",
-      discriminator: [196, 130, 22, 16, 244, 56, 249, 133],
+      discriminator: [54, 241, 46, 84, 4, 212, 46, 94],
       accounts: [
         { name: "host", signer: true },
         { name: "pool", writable: true }
@@ -219,7 +219,7 @@ export const IDL: Poolly = {
   ],
   accounts: [
     { name: "pool", discriminator: [241, 154, 109, 4, 17, 177, 109, 188] },
-    { name: "memberRecord", discriminator: [12, 166, 195, 0, 252, 242, 91, 239] },
+    { name: "memberRecord", discriminator: [26, 35, 161, 83, 248, 8, 189, 249] },
   ],
   types: [
     {
