@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   const body = await request.json() as { password?: string };
   const { password } = body;
 
-  const secret = process.env.ADMIN_SECRET;
+  const secret = process.env.ADMIN_SECRET?.trim();
   if (!secret || password !== secret) {
     return Response.json({ ok: false, error: "Invalid password" }, { status: 401 });
   }

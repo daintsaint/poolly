@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Allow login page through without auth check
@@ -9,7 +9,7 @@ export function proxy(request: NextRequest) {
   }
 
   const token = request.cookies.get("admin_token")?.value;
-  const secret = process.env.ADMIN_SECRET;
+  const secret = process.env.ADMIN_SECRET?.trim();
 
   if (!secret || token !== secret) {
     const loginUrl = new URL("/admin/login", request.url);
