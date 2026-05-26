@@ -39,21 +39,21 @@ export default function AdminPaymentsPage() {
       });
 
       // CYCLE CHARGE events
-      if (pool.totalCycles > 0) {
-        const priceUsdc = pool.pricePerSlot.toNumber() / 1_000_000;
-        const chargeAmount = pool.filledSlots * priceUsdc;
-        const fee = chargeAmount * PLATFORM_FEE;
-        const net = chargeAmount - fee;
-        const nextCharge = pool.nextChargeAt.toNumber();
-        const cycleSecs = pool.cycleDays * 86400;
+      const nextCharge = pool.nextChargeAt.toNumber();
+      const cycleSecs = pool.cycleDays * 86400;
+      const createdAt = pool.createdAt.toNumber();
+      const priceUsdc = pool.pricePerSlot.toNumber() / 1_000_000;
+      const chargeAmount = pool.filledSlots * priceUsdc;
+      const fee = chargeAmount * PLATFORM_FEE;
+      const net = chargeAmount - fee;
 
-        const createdAt = pool.createdAt.toNumber();
-        for (let i = 0; i < pool.totalCycles; i++) {
-          const ts = nextCharge - (pool.totalCycles - i) * cycleSecs;
-          // Skip reconstructed dates that fall before the pool existed
-          if (ts < createdAt) continue;
+      // Initial join payment — emitted when pool activates (nextChargeAt is set).
+      // This charge is NOT counted in totalCycles (which only increments on releaseFunds).
+      if (nextCharge > 0 && pool.filledSlots > 0) {
+        const joinChargeTs = nextCharge - cycleSecs;
+        if (joinChargeTs >= createdAt) {
           result.push({
-            date: ts,
+            date: joinChargeTs,
             poolTitle: pool.title,
             poolKey: pool.publicKey.toString(),
             eventType: "CYCLE CHARGE",
@@ -63,6 +63,24 @@ export default function AdminPaymentsPage() {
             netToHost: net,
           });
         }
+      }
+
+      // Subsequent cycle charges from releaseFunds calls
+      for (let i = 0; i < pool.totalCycles; i++) {
+        const ts = nextCharge - (pool.totalCycles - i) * cycleSecs;
+        // Skip reconstructed dates that fall before the pool existed
+        // or that would duplicate the join charge date
+        if (ts < createdAt || ts === nextCharge - cycleSecs) continue;
+        result.push({
+          date: ts,
+          poolTitle: pool.title,
+          poolKey: pool.publicKey.toString(),
+          eventType: "CYCLE CHARGE",
+          members: pool.filledSlots,
+          amount: chargeAmount,
+          platformFee: fee,
+          netToHost: net,
+        });
       }
     }
 
