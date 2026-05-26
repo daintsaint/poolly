@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { AnchorProvider } from "@coral-xyz/anchor";
+import { AnchorProvider, BN } from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import {
   getAssociatedTokenAddressSync,
@@ -16,7 +16,9 @@ import {
   isPoolActive,
   isPoolPending,
   deriveMemberPda,
+  fetchPoolMembers,
   type PoolAccount,
+  type MemberRecord,
 } from "@/lib/poolly-client";
 import { CATEGORIES, PLATFORM_WALLET } from "@/lib/constants";
 import { ProofVerifier } from "@/components/proof-verifier";
@@ -42,6 +44,7 @@ export default function PoolDetailPage() {
   const { publicKey } = useWallet();
 
   const [pool, setPool] = useState<PoolAccount | null>(null);
+  const [members, setMembers] = useState<MemberRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [escrowBalance, setEscrowBalance] = useState<number | null>(null);
 
@@ -70,6 +73,10 @@ export default function PoolDetailPage() {
       const data = await program.account.pool.fetch(poolKey);
       const poolAcc: PoolAccount = { publicKey: poolKey, ...data };
       setPool(poolAcc);
+
+      // Fetch real member records
+      const memberRecords = await fetchPoolMembers(connection, poolKey);
+      setMembers(memberRecords);
 
       const escrowAta = getAssociatedTokenAddressSync(poolAcc.mint, poolKey, true);
       try {
@@ -242,13 +249,35 @@ export default function PoolDetailPage() {
 
   const tabs = ["Members", "Activity", "Reviews", "Terms"];
 
-  /* ── Mock member rows ── */
-  const mockMembers = [
-    { handle: "maya.sol", role: "HOST", joined: "May 1", paid: formatUsdc(pool.pricePerSlot), status: "ACTIVE" },
-    { handle: "jin.sol",  role: "MEMBER", joined: "May 2", paid: formatUsdc(pool.pricePerSlot), status: "ACTIVE" },
-    { handle: "eli.sol",  role: "MEMBER", joined: "May 4", paid: formatUsdc(pool.pricePerSlot), status: "ACTIVE" },
-    { handle: "—",        role: "OPEN",   joined: "—",     paid: "—",                          status: "OPEN" },
-  ].slice(0, pool.maxSlots);
+  /* ── Real member rows ── */
+  function shortKey(pk: PublicKey) {
+    const s = pk.toBase58();
+    return `${s.slice(0, 4)}…${s.slice(-4)}`;
+  }
+  function fmtDate(ts: BN) {
+    return new Date(ts.toNumber() * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+
+  const realRows = members.map((m) => ({
+    key: m.publicKey.toBase58(),
+    handle: shortKey(m.wallet),
+    role: m.wallet.toBase58() === pool.host.toBase58() ? "HOST" : "MEMBER",
+    joined: fmtDate(m.joinedAt),
+    paid: formatUsdc(pool.pricePerSlot),
+    cyclesPaid: m.cyclesPaid,
+    walletPk: m.wallet,
+    status: "ACTIVE",
+  }));
+
+  // Sort: host first, then chronological
+  realRows.sort((a, b) => {
+    if (a.role === "HOST") return -1;
+    if (b.role === "HOST") return 1;
+    return 0;
+  });
+
+  const openSeats = Math.max(0, pool.maxSlots - pool.filledSlots);
+  const openRows = Array.from({ length: openSeats }, (_, i) => ({ key: `open-${i}` }));
 
   /* ── Activity tab data (derived from on-chain cycles) ── */
   const activityItems = pool.totalCycles > 0
@@ -915,9 +944,16 @@ export default function PoolDetailPage() {
                   ))}
                 </div>
 
-                {mockMembers.map((m, i) => (
+                {realRows.length === 0 && openSeats === 0 && (
+                  <div style={{ padding: "32px 16px", textAlign: "center" }}>
+                    <p className="b-eyebrow">NO MEMBERS YET</p>
+                  </div>
+                )}
+
+                {/* Real member rows */}
+                {realRows.map((m) => (
                   <div
-                    key={i}
+                    key={m.key}
                     style={{
                       display: "grid",
                       gridTemplateColumns: "2fr 0.8fr 0.8fr 0.8fr 0.6fr",
@@ -925,24 +961,17 @@ export default function PoolDetailPage() {
                       borderBottom: "1px solid var(--b-rule)",
                       padding: "14px 16px",
                       alignItems: "center",
-                      background: m.status === "OPEN" ? "rgba(201,162,79,0.03)" : "transparent",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      {m.status === "OPEN" ? (
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", border: "1.5px dashed rgba(201,162,79,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <span style={{ color: "var(--b-gold)", fontSize: 14, opacity: 0.5 }}>+</span>
-                        </div>
-                      ) : (
-                        <Avatar name={m.handle} size={28} />
-                      )}
+                      <Avatar name={m.handle} size={28} />
                       <div>
-                        <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: m.status === "OPEN" ? "var(--b-paper-40)" : "var(--b-paper)", letterSpacing: "0.04em" }}>
-                          {m.status === "OPEN" ? <em className="b-italic" style={{ color: "var(--b-paper-40)", fontFamily: "var(--font-newsreader), serif", fontSize: 13 }}>1 open seat — could be yours</em> : m.handle}
+                        <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper)", letterSpacing: "0.04em" }}>
+                          {m.handle}
                         </p>
-                        {m.role !== "OPEN" && (
-                          <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 9, color: "var(--b-paper-40)", letterSpacing: "0.12em", textTransform: "uppercase" }}>{m.role}</p>
-                        )}
+                        <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 9, color: m.role === "HOST" ? "var(--b-gold)" : "var(--b-paper-40)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                          {m.role}
+                        </p>
                       </div>
                     </div>
                     <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)" }}>{m.joined}</p>
@@ -952,42 +981,89 @@ export default function PoolDetailPage() {
                         display: "inline-flex",
                         alignItems: "center",
                         padding: "2px 7px",
-                        border: `1px solid ${m.status === "ACTIVE" ? "rgba(92,135,112,0.35)" : "rgba(201,162,79,0.3)"}`,
+                        border: "1px solid rgba(92,135,112,0.35)",
                         fontFamily: "var(--font-geist-mono), monospace",
                         fontSize: 9,
-                        color: m.status === "ACTIVE" ? "var(--b-emerald)" : "var(--b-gold)",
+                        color: "var(--b-emerald)",
                         letterSpacing: "0.12em",
                         textTransform: "uppercase",
                         width: "fit-content",
                       }}
                     >
-                      {m.status}
+                      ACTIVE
                     </span>
-                    {m.status !== "OPEN" ? (
-                      <a href="#" style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-gold)", textDecoration: "none" }}>↗</a>
-                    ) : (
-                      open && !isHost ? (
-                        <button
-                          onClick={() => setJoinStep("confirm")}
-                          disabled={!wallet}
-                          style={{
-                            background: "var(--b-gold)",
-                            color: "var(--b-ink)",
-                            border: "none",
-                            padding: "5px 12px",
-                            fontFamily: "var(--font-geist-mono), monospace",
-                            fontSize: 9.5,
-                            fontWeight: 700,
-                            letterSpacing: "0.12em",
-                            textTransform: "uppercase",
-                            cursor: "pointer",
-                            opacity: !wallet ? 0.5 : 1,
-                          }}
-                        >
-                          CLAIM →
-                        </button>
-                      ) : <span />
-                    )}
+                    <a
+                      href={`https://solscan.io/address/${m.walletPk.toBase58()}?cluster=devnet`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-gold)", textDecoration: "none" }}
+                    >
+                      ↗
+                    </a>
+                  </div>
+                ))}
+
+                {/* Open seat rows */}
+                {openRows.map((row, i) => (
+                  <div
+                    key={row.key}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "2fr 0.8fr 0.8fr 0.8fr 0.6fr",
+                      gap: 0,
+                      borderBottom: "1px solid var(--b-rule)",
+                      padding: "14px 16px",
+                      alignItems: "center",
+                      background: "rgba(201,162,79,0.03)",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: "50%", border: "1.5px dashed rgba(201,162,79,0.35)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <span style={{ color: "var(--b-gold)", fontSize: 14, opacity: 0.5 }}>+</span>
+                      </div>
+                      <em className="b-italic" style={{ color: "var(--b-paper-40)", fontFamily: "var(--font-newsreader), serif", fontSize: 13 }}>
+                        open seat {openSeats > 1 ? `${i + 1} of ${openSeats}` : "— could be yours"}
+                      </em>
+                    </div>
+                    <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)" }}>—</p>
+                    <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)" }}>—</p>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        padding: "2px 7px",
+                        border: "1px solid rgba(201,162,79,0.3)",
+                        fontFamily: "var(--font-geist-mono), monospace",
+                        fontSize: 9,
+                        color: "var(--b-gold)",
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        width: "fit-content",
+                      }}
+                    >
+                      OPEN
+                    </span>
+                    {open && !isHost ? (
+                      <button
+                        onClick={() => setJoinStep("confirm")}
+                        disabled={!wallet}
+                        style={{
+                          background: "var(--b-gold)",
+                          color: "var(--b-ink)",
+                          border: "none",
+                          padding: "5px 12px",
+                          fontFamily: "var(--font-geist-mono), monospace",
+                          fontSize: 9.5,
+                          fontWeight: 700,
+                          letterSpacing: "0.12em",
+                          textTransform: "uppercase",
+                          cursor: "pointer",
+                          opacity: !wallet ? 0.5 : 1,
+                        }}
+                      >
+                        CLAIM →
+                      </button>
+                    ) : <span />}
                   </div>
                 ))}
               </div>

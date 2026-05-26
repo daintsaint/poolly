@@ -3,6 +3,15 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { IDL, Poolly } from "./idl";
 import { MEMBER_SEED, POOL_SEED, POOLLY_PROGRAM_ID } from "./constants";
 
+export type MemberRecord = {
+  publicKey: PublicKey;
+  pool: PublicKey;
+  wallet: PublicKey;
+  joinedAt: BN;
+  cyclesPaid: number;
+  bump: number;
+};
+
 export type PoolAccount = {
   publicKey: PublicKey;
   host: PublicKey;
@@ -48,6 +57,20 @@ export async function fetchAllPools(
   const program = getProgram(provider);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const accounts = await (program.account as any).pool.all();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return accounts.map((a: any) => ({ publicKey: a.publicKey, ...a.account }));
+}
+
+export async function fetchPoolMembers(
+  connection: Connection,
+  poolKey: PublicKey
+): Promise<MemberRecord[]> {
+  const provider = new AnchorProvider(connection, {} as never, {});
+  const program = getProgram(provider);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const accounts = await (program.account as any).memberRecord.all([
+    { memcmp: { offset: 8, bytes: poolKey.toBase58() } },
+  ]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return accounts.map((a: any) => ({ publicKey: a.publicKey, ...a.account }));
 }
