@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { BNav, BTicker, BEscrowSpecimen, BFooter, ServiceMark, PoolSlots } from "@/components/vault-ui";
+import { DemandIntel } from "@/components/demand-intel";
+import { BundleOptimizer } from "@/components/bundle-optimizer";
 
 /* ─── Static catalog data ─── */
 const CATALOG_ROW_1 = [
@@ -211,7 +213,7 @@ export default function Home() {
               Enter the Catalog →
             </Link>
             <a
-              href="https://github.com"
+              href="https://solscan.io/account/Edv6BNFLKPKJ4KUWco2MEmGSTsdSU4xBWFsaFFmezpcq?cluster=devnet"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -647,6 +649,65 @@ export default function Home() {
           >
             — POOLLY LABS · MMXXVI
           </p>
+        </div>
+      </section>
+
+      {/* ── AI INTELLIGENCE ─────────────────────────────── */}
+      <section style={{ background: "var(--b-ink-2)", padding: "96px 40px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <p className="b-eyebrow" style={{ marginBottom: 20 }}>V. THE INTELLIGENCE</p>
+          <h2
+            className="b-serif"
+            style={{ fontSize: "clamp(36px, 4.5vw, 60px)", lineHeight: 1.05, color: "var(--b-paper)", marginBottom: 12 }}
+          >
+            AI that finds your{" "}
+            <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>optimal bundle.</em>
+          </h2>
+          <p
+            style={{
+              fontFamily: "var(--font-geist), sans-serif",
+              fontSize: 15,
+              color: "var(--b-paper-60)",
+              lineHeight: 1.6,
+              maxWidth: 560,
+              marginBottom: 56,
+            }}
+          >
+            Groq-powered AI scans live market data to build your cheapest subscription stack — and shows hosts where demand is highest.
+          </p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, alignItems: "start" }}>
+            {/* Bundle Optimizer */}
+            <BundleOptimizer />
+
+            {/* Demand Intel */}
+            <div
+              style={{
+                background: "var(--b-ink-3)",
+                border: "1px solid var(--b-rule)",
+                padding: "32px 28px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 0,
+              }}
+            >
+              <p className="b-eyebrow" style={{ marginBottom: 10 }}>AI Pool Ideas · Live Demand</p>
+              <p
+                className="b-serif"
+                style={{
+                  fontSize: 28,
+                  lineHeight: 1.1,
+                  color: "var(--b-paper)",
+                  marginBottom: 28,
+                }}
+              >
+                Where hosts{" "}
+                <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>make money</em>{" "}
+                right now.
+              </p>
+              <DemandIntel />
+            </div>
+          </div>
         </div>
       </section>
 

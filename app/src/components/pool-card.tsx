@@ -18,7 +18,7 @@ const CAT_TO_SVC: Record<number, string> = {
   0: "netflix",
   1: "ms365",
   2: "peloton",
-  3: "notion",
+  3: "disney",
   4: "adobe",
   5: "chatgpt",
 };

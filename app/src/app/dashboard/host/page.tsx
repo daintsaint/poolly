@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { BNav, BTicker, BFooter, ServiceMark, PoolSlots } from "@/components/vault-ui";
 import { DemandIntel } from "@/components/demand-intel";
@@ -25,18 +26,19 @@ function statusStyle(s: string) {
 }
 
 const NAV_ITEMS = [
-  { label: "Overview",         badge: null,  active: true  },
-  { label: "My pools",         badge: "6",   active: false },
-  { label: "Payouts",          badge: null,  active: false },
-  { label: "Disputes",         badge: "0",   active: false },
-  { label: "Catalog listing",  badge: null,  active: false },
-  { label: "Settings",         badge: null,  active: false },
+  { label: "Overview",         badge: null },
+  { label: "My pools",         badge: "6"  },
+  { label: "Payouts",          badge: null },
+  { label: "Disputes",         badge: "0"  },
+  { label: "Demand Intel",     badge: null },
+  { label: "Settings",         badge: null },
 ];
 
 export default function HostDashboard() {
   const { publicKey } = useWallet();
   const addr = publicKey ? publicKey.toBase58() : "not connected";
   const short = publicKey ? `${addr.slice(0, 8)}…` : "—";
+  const [activeNav, setActiveNav] = useState("Overview");
 
   return (
     <div style={{ background: "var(--b-ink)", minHeight: "100vh" }}>
@@ -64,44 +66,50 @@ export default function HostDashboard() {
               HOST · {short}
             </p>
 
-            {NAV_ITEMS.map((item) => (
-              <div
-                key={item.label}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "11px 24px",
-                  borderLeft: item.active ? "2px solid var(--b-gold)" : "2px solid transparent",
-                  background: item.active ? "rgba(201,162,79,0.06)" : "transparent",
-                  cursor: "pointer",
-                  transition: "background 0.15s",
-                }}
-              >
-                <span
+            {NAV_ITEMS.map((item) => {
+              const active = activeNav === item.label;
+              return (
+                <div
+                  key={item.label}
+                  onClick={() => setActiveNav(item.label)}
                   style={{
-                    fontSize: 13,
-                    color: item.active ? "var(--b-paper)" : "var(--b-paper-60)",
-                    fontFamily: "var(--font-geist), sans-serif",
-                    fontWeight: item.active ? 600 : 400,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "11px 24px",
+                    borderLeft: active ? "2px solid var(--b-gold)" : "2px solid transparent",
+                    background: active ? "rgba(201,162,79,0.06)" : "transparent",
+                    cursor: "pointer",
+                    transition: "background 0.15s",
                   }}
+                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = "rgba(237,230,214,0.03)"; }}
+                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = "transparent"; }}
                 >
-                  {item.label}
-                </span>
-                {item.badge !== null && (
                   <span
                     style={{
-                      fontFamily: "var(--font-geist-mono), monospace",
-                      fontSize: 10,
-                      color: item.active ? "var(--b-gold)" : "var(--b-paper-40)",
-                      letterSpacing: "0.08em",
+                      fontSize: 13,
+                      color: active ? "var(--b-paper)" : "var(--b-paper-60)",
+                      fontFamily: "var(--font-geist), sans-serif",
+                      fontWeight: active ? 600 : 400,
                     }}
                   >
-                    {item.badge}
+                    {item.label}
                   </span>
-                )}
-              </div>
-            ))}
+                  {item.badge !== null && (
+                    <span
+                      style={{
+                        fontFamily: "var(--font-geist-mono), monospace",
+                        fontSize: 10,
+                        color: active ? "var(--b-gold)" : "var(--b-paper-40)",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* New plan CTA */}
@@ -182,7 +190,47 @@ export default function HostDashboard() {
             ))}
           </div>
 
-          {/* 2-col body */}
+          {/* Demand Intel full panel */}
+          {activeNav === "Demand Intel" && (
+            <div
+              style={{
+                background: "var(--b-ink-3)",
+                border: "1px solid rgba(201,162,79,0.2)",
+                padding: "28px",
+                marginBottom: 32,
+              }}
+            >
+              <p className="b-eyebrow" style={{ marginBottom: 20 }}>AI POOL IDEAS · LIVE DEMAND</p>
+              <DemandIntel />
+            </div>
+          )}
+
+          {/* Payouts stub */}
+          {activeNav === "Payouts" && (
+            <div style={{ border: "1px solid var(--b-rule)", padding: "40px", textAlign: "center", marginBottom: 32 }}>
+              <p className="b-serif" style={{ fontSize: 28, color: "var(--b-paper-60)", marginBottom: 12 }}>Payout history coming soon.</p>
+              <p className="b-eyebrow">ALL RELEASES ARE VISIBLE ON-CHAIN VIA SOLSCAN</p>
+            </div>
+          )}
+
+          {/* Disputes stub */}
+          {activeNav === "Disputes" && (
+            <div style={{ border: "1px solid var(--b-rule)", padding: "40px", textAlign: "center", marginBottom: 32 }}>
+              <p className="b-serif" style={{ fontSize: 56, color: "var(--b-emerald)", marginBottom: 8 }}>0</p>
+              <p className="b-eyebrow">OPEN DISPUTES · CLEAN RECORD</p>
+            </div>
+          )}
+
+          {/* Settings stub */}
+          {activeNav === "Settings" && (
+            <div style={{ border: "1px solid var(--b-rule)", padding: "40px", textAlign: "center", marginBottom: 32 }}>
+              <p className="b-serif" style={{ fontSize: 28, color: "var(--b-paper-60)", marginBottom: 12 }}>Account settings</p>
+              <p className="b-eyebrow">CONNECT WALLET TO MANAGE SETTINGS</p>
+            </div>
+          )}
+
+          {/* 2-col body — shown for Overview and My pools */}
+          {(activeNav === "Overview" || activeNav === "My pools") && (
           <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 32 }}>
 
             {/* Left: pool list */}
@@ -280,6 +328,7 @@ export default function HostDashboard() {
               </div>
             </div>
           </div>
+          )}
         </main>
       </div>
 

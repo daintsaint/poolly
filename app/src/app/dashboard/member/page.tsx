@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { BNav, BTicker, BFooter, ServiceMark, Avatar, PoolSlots } from "@/components/vault-ui";
 import { BundleOptimizer } from "@/components/bundle-optimizer";
+import Link from "next/link";
 
 /* ─── Static placeholder data ─── */
 const MY_POOLS = [
@@ -30,6 +32,7 @@ export default function MemberDashboard() {
   const { publicKey } = useWallet();
   const addr = publicKey ? publicKey.toBase58() : "not connected";
   const short = publicKey ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : "—";
+  const [activeFilter, setActiveFilter] = useState<"ALL" | "ACTIVE" | "ARCHIVED">("ALL");
 
   return (
     <div style={{ background: "var(--b-ink)", minHeight: "100vh" }}>
@@ -50,7 +53,8 @@ export default function MemberDashboard() {
             </h1>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <button
+            <Link
+              href="/pools"
               style={{
                 background: "transparent",
                 border: "1px solid var(--b-rule)",
@@ -62,11 +66,16 @@ export default function MemberDashboard() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 cursor: "pointer",
+                textDecoration: "none",
+                display: "inline-flex",
               }}
             >
-              + ADD A POOL
-            </button>
-            <button
+              + BROWSE POOLS
+            </Link>
+            <a
+              href="https://solfaucet.com"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 background: "var(--b-gold)",
                 border: "none",
@@ -78,10 +87,12 @@ export default function MemberDashboard() {
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
                 cursor: "pointer",
+                textDecoration: "none",
+                display: "inline-flex",
               }}
             >
-              TOP UP USDC →
-            </button>
+              GET USDC →
+            </a>
           </div>
         </div>
 
@@ -201,26 +212,31 @@ export default function MemberDashboard() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 0 }}>
             <p className="b-serif" style={{ fontSize: 36, color: "var(--b-paper)" }}>My pools</p>
             <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-              {FILTER_TABS.map((tab, i) => (
-                <button
-                  key={tab.label}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    borderBottom: i === 0 ? "2px solid var(--b-gold)" : "2px solid transparent",
-                    padding: "8px 16px",
-                    fontFamily: "var(--font-geist-mono), monospace",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: i === 0 ? "var(--b-gold)" : "var(--b-paper-40)",
-                    cursor: "pointer",
-                  }}
-                >
-                  {tab.label} · {tab.count}
-                </button>
-              ))}
+              {FILTER_TABS.map((tab) => {
+                const active = activeFilter === tab.label;
+                return (
+                  <button
+                    key={tab.label}
+                    onClick={() => setActiveFilter(tab.label as "ALL" | "ACTIVE" | "ARCHIVED")}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      borderBottom: active ? "2px solid var(--b-gold)" : "2px solid transparent",
+                      padding: "8px 16px",
+                      fontFamily: "var(--font-geist-mono), monospace",
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      color: active ? "var(--b-gold)" : "var(--b-paper-40)",
+                      cursor: "pointer",
+                      transition: "color 0.15s",
+                    }}
+                  >
+                    {tab.label} · {tab.count}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -242,7 +258,7 @@ export default function MemberDashboard() {
           </div>
 
           {/* Pool rows */}
-          {MY_POOLS.map((pool) => (
+          {(activeFilter === "ARCHIVED" ? [] : MY_POOLS).map((pool) => (
             <div
               key={pool.id}
               className="lift"
@@ -298,7 +314,8 @@ export default function MemberDashboard() {
               </span>
 
               {/* Manage */}
-              <button
+              <Link
+                href="/pools"
                 style={{
                   background: "transparent",
                   border: "1px solid var(--b-rule)",
@@ -311,10 +328,12 @@ export default function MemberDashboard() {
                   textTransform: "uppercase",
                   cursor: "pointer",
                   transition: "all 0.15s",
+                  textDecoration: "none",
+                  display: "inline-flex",
                 }}
               >
                 MANAGE →
-              </button>
+              </Link>
             </div>
           ))}
         </div>

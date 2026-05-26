@@ -21,6 +21,7 @@ const SVC_GLYPHS: Record<string, string> = {
   nyt: "T",
   chatgpt: "✦",
   claude: "C",
+  nordvpn: "VPN",
 };
 
 type ServiceMarkProps = {
@@ -599,19 +600,43 @@ export function BFooter() {
   const cols = [
     {
       label: "CATALOG",
-      links: ["Browse Plans", "All Streaming", "Productivity", "Fitness", "Professional"],
+      links: [
+        { label: "Browse Plans",    href: "/pools" },
+        { label: "All Streaming",   href: "/pools?category=0" },
+        { label: "Productivity",    href: "/pools?category=1" },
+        { label: "Fitness",         href: "/pools?category=2" },
+        { label: "Professional",    href: "/pools?category=4" },
+      ],
     },
     {
       label: "MECHANISM",
-      links: ["How It Works", "Smart Contract", "Escrow Design", "Fee Structure", "Dispute Flow"],
+      links: [
+        { label: "How It Works",    href: "/#mechanism" },
+        { label: "Smart Contract",  href: "https://solscan.io/account/Edv6BNFLKPKJ4KUWco2MEmGSTsdSU4xBWFsaFFmezpcq?cluster=devnet" },
+        { label: "Escrow Design",   href: "/#mechanism" },
+        { label: "Fee Structure",   href: "/#mechanism" },
+        { label: "Dispute Flow",    href: "/#mechanism" },
+      ],
     },
     {
       label: "HOST",
-      links: ["Start Hosting", "Host Dashboard", "List a Plan", "Payout History", "Host FAQ"],
+      links: [
+        { label: "Start Hosting",   href: "/pools/create" },
+        { label: "Host Dashboard",  href: "/dashboard/host" },
+        { label: "List a Plan",     href: "/pools/create" },
+        { label: "Payout History",  href: "/dashboard/host" },
+        { label: "Host FAQ",        href: "/#mechanism" },
+      ],
     },
     {
       label: "VAULT",
-      links: ["Member Club", "My Plans", "Savings Tracker", "Referrals", "Account"],
+      links: [
+        { label: "My Dashboard",    href: "/dashboard/member" },
+        { label: "My Plans",        href: "/dashboard/member" },
+        { label: "AI Bundle Planner", href: "/dashboard/member" },
+        { label: "Browse Pools",    href: "/pools" },
+        { label: "Host a Plan",     href: "/pools/create" },
+      ],
     },
   ];
 
@@ -643,8 +668,10 @@ export function BFooter() {
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {col.links.map((l) => (
                   <a
-                    key={l}
-                    href="#"
+                    key={l.label}
+                    href={l.href}
+                    target={l.href.startsWith("http") ? "_blank" : undefined}
+                    rel={l.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     style={{
                       fontSize: 13,
                       color: "var(--b-paper-40)",
@@ -655,7 +682,7 @@ export function BFooter() {
                     onMouseEnter={(e) => (e.currentTarget.style.color = "var(--b-paper)")}
                     onMouseLeave={(e) => (e.currentTarget.style.color = "var(--b-paper-40)")}
                   >
-                    {l}
+                    {l.label}
                   </a>
                 ))}
               </div>

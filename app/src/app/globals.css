@@ -91,6 +91,7 @@ body {
 .svc-nyt      { background: white; color: black; }
 .svc-chatgpt  { background: #10A37F; color: white; }
 .svc-claude   { background: #C96442; color: white; }
+.svc-nordvpn  { background: #4687FF; color: white; }
 
 /* ── Animations ── */
 @keyframes pulse {

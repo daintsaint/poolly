@@ -20,9 +20,7 @@ export function Chatbot() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
+    if (open) setTimeout(() => inputRef.current?.focus(), 100);
   }, [open]);
 
   useEffect(() => {
@@ -57,7 +55,6 @@ export function Chatbot() {
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-
         const chunk = decoder.decode(value);
         for (const line of chunk.split("\n")) {
           if (!line.startsWith("data: ")) continue;
@@ -84,22 +81,32 @@ export function Chatbot() {
       {/* Floating button */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all"
-        style={{
-          background: open ? "rgba(124,58,237,0.9)" : "linear-gradient(135deg,#7c3aed,#6366f1)",
-          boxShadow: "0 8px 32px rgba(124,58,237,0.5)",
-          border: "1px solid rgba(255,255,255,0.15)",
-        }}
         aria-label="Ask Poolly AI"
+        style={{
+          position: "fixed",
+          bottom: 24,
+          right: 24,
+          zIndex: 50,
+          width: 52,
+          height: 52,
+          background: open ? "var(--b-ink-2)" : "var(--b-gold)",
+          border: `1px solid ${open ? "var(--b-rule)" : "var(--b-gold)"}`,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "all 0.2s",
+          boxShadow: open ? "none" : "0 4px 24px rgba(201,162,79,0.35)",
+        }}
       >
         {open ? (
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M2 2l14 14M16 2L2 16" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="var(--b-paper-60)" strokeWidth="1.5" strokeLinecap="round"/>
           </svg>
         ) : (
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <path d="M3 7h16M3 11h10M3 15h7" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
-            <circle cx="18" cy="15" r="3.5" fill="#34d399"/>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M2 5h14M2 9h9M2 13h6" stroke="var(--b-ink)" strokeWidth="1.6" strokeLinecap="round"/>
+            <circle cx="15" cy="13" r="2.5" fill="var(--b-emerald)"/>
           </svg>
         )}
       </button>
@@ -107,75 +114,172 @@ export function Chatbot() {
       {/* Chat window */}
       {open && (
         <div
-          className="fixed bottom-24 right-6 z-50 flex flex-col rounded-3xl overflow-hidden shadow-2xl"
           style={{
-            width: "360px",
-            height: "500px",
-            background: "var(--bg-card)",
-            border: "1px solid rgba(124,58,237,0.25)",
-            boxShadow: "0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,58,237,0.15)",
+            position: "fixed",
+            bottom: 88,
+            right: 24,
+            zIndex: 50,
+            width: 360,
+            height: 500,
+            background: "var(--b-ink-2)",
+            border: "1px solid var(--b-rule)",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.7)",
           }}
         >
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3.5 shrink-0"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", background: "rgba(124,58,237,0.08)" }}>
-            <div className="h-8 w-8 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 4h10M2 7h6M2 10h4" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "14px 16px",
+              borderBottom: "1px solid var(--b-rule)",
+              background: "var(--b-ink-3)",
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                background: "var(--b-gold)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M1 3h10M1 6h7M1 9h5" stroke="var(--b-ink)" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </div>
             <div>
-              <p className="text-sm font-bold text-white">Ask Poolly</p>
-              <p className="text-xs" style={{ color: "#34d399" }}>● AI assistant · always on</p>
+              <p
+                style={{
+                  fontFamily: "var(--font-geist-mono), monospace",
+                  fontSize: 11,
+                  color: "var(--b-paper)",
+                  letterSpacing: "0.10em",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                }}
+              >
+                Ask Poolly
+              </p>
+              <p
+                style={{
+                  fontFamily: "var(--font-geist-mono), monospace",
+                  fontSize: 9.5,
+                  color: "var(--b-emerald)",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                ● AI · always on
+              </p>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+          <div
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              padding: "16px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
             {messages.length === 0 ? (
-              <div className="space-y-4 pt-2">
-                <p className="text-sm text-center" style={{ color: "var(--text-2)" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 8 }}>
+                <p
+                  style={{
+                    fontFamily: "var(--font-newsreader), Georgia, serif",
+                    fontSize: 16,
+                    fontStyle: "italic",
+                    color: "var(--b-paper-60)",
+                    lineHeight: 1.5,
+                    textAlign: "center",
+                    marginBottom: 4,
+                  }}
+                >
                   Ask me anything about saving on subscriptions.
                 </p>
-                <div className="grid grid-cols-1 gap-2">
-                  {STARTERS.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => send(s)}
-                      className="text-left text-xs px-3 py-2.5 rounded-xl transition-all"
-                      style={{
-                        background: "rgba(124,58,237,0.08)",
-                        border: "1px solid rgba(124,58,237,0.2)",
-                        color: "#a78bfa",
-                      }}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
+                {STARTERS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => send(s)}
+                    style={{
+                      background: "transparent",
+                      border: "1px solid var(--b-rule)",
+                      color: "var(--b-paper-60)",
+                      padding: "9px 12px",
+                      textAlign: "left",
+                      fontFamily: "var(--font-geist), sans-serif",
+                      fontSize: 12,
+                      cursor: "pointer",
+                      transition: "all 0.15s",
+                      lineHeight: 1.4,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(201,162,79,0.4)";
+                      e.currentTarget.style.color = "var(--b-paper)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "var(--b-rule)";
+                      e.currentTarget.style.color = "var(--b-paper-60)";
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
               </div>
             ) : (
               messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    justifyContent: m.role === "user" ? "flex-end" : "flex-start",
+                  }}
+                >
                   <div
-                    className="max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed"
-                    style={m.role === "user" ? {
-                      background: "linear-gradient(135deg,#7c3aed,#6366f1)",
-                      color: "white",
-                      borderBottomRightRadius: "6px",
-                    } : {
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.07)",
-                      color: "var(--text-1)",
-                      borderBottomLeftRadius: "6px",
+                    style={{
+                      maxWidth: "85%",
+                      padding: "10px 14px",
+                      fontSize: 13,
+                      lineHeight: 1.55,
+                      ...(m.role === "user"
+                        ? {
+                            background: "var(--b-gold)",
+                            color: "var(--b-ink)",
+                            fontFamily: "var(--font-geist), sans-serif",
+                          }
+                        : {
+                            background: "var(--b-ink-3)",
+                            border: "1px solid var(--b-rule)",
+                            color: "var(--b-paper)",
+                            fontFamily: "var(--font-geist), sans-serif",
+                          }),
                     }}
                   >
                     {m.content || (
-                      <span className="flex gap-1 py-0.5">
-                        {[0,1,2].map((d) => (
-                          <span key={d} className="w-1.5 h-1.5 rounded-full bg-violet-400"
-                            style={{ animation: `bounce 1s ease-in-out ${d * 0.15}s infinite` }}/>
+                      <span style={{ display: "flex", gap: 4, paddingTop: 2 }}>
+                        {[0, 1, 2].map((d) => (
+                          <span
+                            key={d}
+                            style={{
+                              width: 5,
+                              height: 5,
+                              borderRadius: "50%",
+                              background: "var(--b-gold)",
+                              display: "inline-block",
+                              animation: `bounce 1s ease-in-out ${d * 0.15}s infinite`,
+                            }}
+                          />
                         ))}
                       </span>
                     )}
@@ -183,38 +287,82 @@ export function Chatbot() {
                 </div>
               ))
             )}
-            <div ref={bottomRef}/>
+            <div ref={bottomRef} />
           </div>
 
           {/* Input */}
-          <div className="px-3 py-3 shrink-0"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            <div className="flex gap-2 items-center rounded-xl px-3 py-2"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <div
+            style={{
+              padding: "12px",
+              borderTop: "1px solid var(--b-rule)",
+              flexShrink: 0,
+              background: "var(--b-ink-3)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                gap: 8,
+                alignItems: "center",
+                background: "var(--b-ink-2)",
+                border: "1px solid var(--b-rule)",
+                padding: "8px 12px",
+              }}
+            >
               <input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    send();
+                  }
+                }}
                 placeholder="Ask anything…"
-                className="flex-1 bg-transparent text-sm outline-none"
-                style={{ color: "var(--text-1)" }}
                 disabled={streaming}
+                style={{
+                  flex: 1,
+                  background: "transparent",
+                  border: "none",
+                  outline: "none",
+                  fontFamily: "var(--font-geist), sans-serif",
+                  fontSize: 13,
+                  color: "var(--b-paper)",
+                }}
               />
               <button
                 onClick={() => send()}
                 disabled={!input.trim() || streaming}
-                className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0 disabled:opacity-40 transition-all"
-                style={{ background: "linear-gradient(135deg,#7c3aed,#6366f1)" }}
+                style={{
+                  width: 28,
+                  height: 28,
+                  background: input.trim() && !streaming ? "var(--b-gold)" : "transparent",
+                  border: `1px solid ${input.trim() && !streaming ? "var(--b-gold)" : "var(--b-rule)"}`,
+                  cursor: input.trim() && !streaming ? "pointer" : "not-allowed",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  transition: "all 0.15s",
+                  opacity: (!input.trim() || streaming) ? 0.4 : 1,
+                }}
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M1 6h10M7 2l4 4-4 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M1 5h8M6 2l3 3-3 3" stroke={input.trim() && !streaming ? "var(--b-ink)" : "var(--b-paper)"} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+      `}</style>
     </>
   );
 }

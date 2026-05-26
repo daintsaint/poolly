@@ -12,7 +12,7 @@ const SERVICES = [
   { id: "ms365",    svcId: "ms365",    label: "Microsoft 365" },
   { id: "adobe",    svcId: "adobe",    label: "Adobe CC" },
   { id: "icloud",   svcId: "icloud",   label: "iCloud+" },
-  { id: "nordvpn",  svcId: "chatgpt",  label: "NordVPN" },
+  { id: "nordvpn",  svcId: "nordvpn",  label: "NordVPN" },
   { id: "notion",   svcId: "notion",   label: "Notion" },
   { id: "peloton",  svcId: "peloton",  label: "Peloton" },
   { id: "chatgpt",  svcId: "chatgpt",  label: "ChatGPT Plus" },
