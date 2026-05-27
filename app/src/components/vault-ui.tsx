@@ -707,6 +707,8 @@ export function BFooter() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
           }}
         >
           <p
@@ -720,17 +722,35 @@ export function BFooter() {
           >
             MMXXVI · POOLLY LABS · ALL RIGHTS RESERVED · FULL PRICE IS OVERRATED
           </p>
-          <p
-            style={{
-              fontFamily: "var(--font-geist-mono), monospace",
-              fontSize: 9.5,
-              color: "var(--b-paper-40)",
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-            }}
-          >
-            PROGRAM HEALTHY · BLOCK 247.2M
-          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <Link
+              href="/legal/terms"
+              style={{
+                fontFamily: "var(--font-geist-mono), monospace",
+                fontSize: 9.5,
+                color: "var(--b-paper-40)",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                textDecoration: "none",
+              }}
+            >
+              Terms
+            </Link>
+            <span style={{ color: "var(--b-rule)", fontSize: 9.5 }}>·</span>
+            <Link
+              href="/legal/privacy"
+              style={{
+                fontFamily: "var(--font-geist-mono), monospace",
+                fontSize: 9.5,
+                color: "var(--b-paper-40)",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                textDecoration: "none",
+              }}
+            >
+              Privacy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
