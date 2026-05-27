@@ -56,6 +56,17 @@ export default function HostDashboard() {
   const [pools, setPools] = useState<PoolWithEscrow[]>([]);
   const [loading, setLoading] = useState(false);
 
+  /* ── Overdue pools (from cron Redis cache) ── */
+  type OverduePool = { address: string; title: string; nextChargeAt: number };
+  const [overduePools, setOverduePools] = useState<OverduePool[]>([]);
+  useEffect(() => {
+    if (!publicKey) return;
+    fetch(`/api/cron/overdue?host=${publicKey.toBase58()}`)
+      .then((r) => r.json())
+      .then((d: { overdue?: OverduePool[] }) => setOverduePools(d.overdue ?? []))
+      .catch(() => {/* non-critical */});
+  }, [publicKey]);
+
   const load = useCallback(async () => {
     if (!publicKey) return;
     setLoading(true);
@@ -167,6 +178,56 @@ export default function HostDashboard() {
               {addr !== "not connected" ? `${addr.slice(0, 12)}…${addr.slice(-6)}` : "WALLET NOT CONNECTED"}
             </p>
           </div>
+
+          {/* ── Overdue pools banner ── */}
+          {overduePools.length > 0 && (
+            <div
+              style={{
+                marginBottom: 32,
+                border: "1px solid rgba(201,162,79,0.4)",
+                background: "rgba(201,162,79,0.06)",
+                padding: "14px 20px",
+              }}
+            >
+              <p
+                className="b-eyebrow"
+                style={{ color: "var(--b-gold)", marginBottom: 10 }}
+              >
+                ⚠ FUNDS READY TO RELEASE — {overduePools.length} POOL{overduePools.length > 1 ? "S" : ""}
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {overduePools.map((p) => (
+                  <div
+                    key={p.address}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "var(--font-geist), sans-serif",
+                        fontSize: 13,
+                        color: "var(--b-paper-60)",
+                      }}
+                    >
+                      {p.title}
+                    </span>
+                    <Link
+                      href={`/pools/${p.address}`}
+                      style={{
+                        fontFamily: "var(--font-geist-mono), monospace",
+                        fontSize: 10,
+                        color: "var(--b-gold)",
+                        textDecoration: "none",
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      RELEASE →
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Not connected state */}
           {NOT_CONNECTED && (
