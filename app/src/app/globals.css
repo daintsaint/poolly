@@ -295,6 +295,14 @@ body {
   .col-hide-mobile { display: none; }
 }
 
+/* ── Nav: hide desktop links on mobile ── */
+.bnav-links { display: flex; align-items: center; gap: 32px; }
+@media (max-width: 768px) { .bnav-links { display: none; } }
+
+/* ── Escrow specimen: 3-col on desktop → 1-col on mobile ── */
+.escrow-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+@media (max-width: 700px) { .escrow-grid { grid-template-columns: 1fr; gap: 20px; } }
+
 /* ── Service badge (legacy) ── */
 .service-badge {
   display: inline-flex;

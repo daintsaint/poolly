@@ -420,7 +420,8 @@ export default function Home() {
             <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>what it costs pooled.</em>
           </h2>
 
-          {/* Table header */}
+          {/* Table — horizontal scroll on mobile */}
+          <div className="table-scroll">
           <div
             style={{
               display: "grid",
@@ -429,6 +430,7 @@ export default function Home() {
               borderBottom: "1px solid var(--b-rule)",
               paddingBottom: 10,
               marginBottom: 0,
+              minWidth: 520,
             }}
           >
             {["PLAN", "RETAIL/MO", "POOLLY/MO", "SAVED/YR", "SEATS"].map((h) => (
@@ -460,6 +462,7 @@ export default function Home() {
                 padding: "20px 0",
                 alignItems: "center",
                 cursor: "pointer",
+                minWidth: 520,
               }}
             >
               {/* Plan */}
@@ -509,6 +512,7 @@ export default function Home() {
               <PoolSlots filled={row.seats} total={row.seats} size={12} gap={4} />
             </div>
           ))}
+          </div>{/* /table-scroll */}
         </div>
       </section>
 
@@ -524,7 +528,8 @@ export default function Home() {
             <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>on a public chain.</em>
           </h2>
 
-          {/* Ledger header */}
+          {/* Ledger — horizontal scroll on mobile */}
+          <div className="table-scroll">
           <div
             style={{
               display: "grid",
@@ -532,6 +537,7 @@ export default function Home() {
               gap: 0,
               borderBottom: "1px solid var(--b-rule)",
               paddingBottom: 10,
+              minWidth: 560,
             }}
           >
             {["TIME", "ACTOR", "EVENT", "PLAN", "AMOUNT", "TX"].map((h) => (
@@ -560,6 +566,7 @@ export default function Home() {
                 borderBottom: "1px solid var(--b-rule)",
                 padding: "16px 0",
                 alignItems: "center",
+                minWidth: 560,
               }}
             >
               <p
@@ -618,6 +625,7 @@ export default function Home() {
               </a>
             </div>
           ))}
+          </div>{/* /table-scroll */}
         </div>
       </section>
 

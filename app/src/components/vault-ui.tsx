@@ -378,8 +378,8 @@ export function BNav() {
           <PoollyLogo variant="lockup" size={28} onDark />
         </Link>
 
-        {/* Center: nav links */}
-        <nav style={{ display: "flex", alignItems: "center", gap: 32 }}>
+        {/* Center: nav links — hidden on mobile */}
+        <nav className="bnav-links">
           {[
             { label: "Browse", href: "/pools" },
             { label: "Share a Plan", href: "/pools/create" },
@@ -419,13 +419,11 @@ export function BNav() {
 export function BEscrowSpecimen() {
   return (
     <div
+      className="escrow-grid"
       style={{
         background: "linear-gradient(135deg, var(--b-ink-3) 0%, var(--b-ink-2) 100%)",
         border: "1px solid var(--b-rule)",
-        padding: 36,
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
-        gap: 32,
+        padding: "clamp(16px, 4vw, 36px)",
       }}
     >
       {/* Col 1: Members lock */}
