@@ -128,6 +128,11 @@ export default function PoolDetailPage() {
   const [nameSaving, setNameSaving] = useState(false);
   const [nameSaved, setNameSaved] = useState(false);
 
+  // Must be called unconditionally — before any early returns
+  const hostWalletStr = pool?.host?.toBase58() ?? null;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const hostDisplayName = useDisplayName(hostWalletStr);
+
   const loadPool = useCallback(async () => {
     try {
       const provider = new AnchorProvider(connection, {} as never, {});
@@ -305,12 +310,9 @@ export default function PoolDetailPage() {
   const closed     = !active && !pending;
   const hostAmount = escrowBalance ? (escrowBalance * 0.94).toFixed(2) : "—";
   const addrShort  = `${address.slice(0, 4)}…${address.slice(-4)}`;
-  const hostWalletStr = pool.host.toBase58();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const hostDisplayName = useDisplayName(hostWalletStr);
-  const hostShort  = hostDisplayName ?? shortWallet(hostWalletStr);
+  const hostShort  = hostDisplayName ?? shortWallet(pool.host.toBase58());
   const isFull     = pool.filledSlots >= pool.maxSlots;
-  const priceNum   = pool.pricePerSlot / 1_000_000; // lamports → USDC
+  const priceNum   = pool.pricePerSlot.toNumber() / 1_000_000; // lamports → USDC
   const hasEnoughUsdc = usdcBalance !== null ? usdcBalance >= priceNum : true;
 
   const tabs = ["Members", "Activity", "Reviews", "Terms"];
