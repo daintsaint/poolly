@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch("https://api.imgbb.com/1/upload", {
       method: "POST",
       body: form,
+      signal: AbortSignal.timeout(10_000), // 10s max
     });
 
     const json = await res.json();

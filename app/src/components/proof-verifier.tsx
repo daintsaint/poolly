@@ -158,6 +158,7 @@ export function ProofVerifier({ poolTitle, category, onConfirmed, submitting }: 
 
     // File — upload to get a permanent public URL first
     setPhase("uploading");
+    const fallback = `verified-proof-${Date.now()}`;
     try {
       const res = await fetch("/api/upload-proof", {
         method: "POST",
@@ -166,11 +167,10 @@ export function ProofVerifier({ poolTitle, category, onConfirmed, submitting }: 
           image: fileBase64,
           name: `poolly-proof-${Date.now()}`,
         }),
+        signal: AbortSignal.timeout(12_000),
       });
       const json = await res.json();
       if (!res.ok || !json.url) {
-        // If upload service unavailable, fall back to a descriptive URI
-        const fallback = `verified-upload-${Date.now()}`;
         console.warn("Upload failed, using fallback URI:", json.error);
         setUploadError("Image hosting unavailable — submitting with a reference ID instead.");
         onConfirmed(fallback);
@@ -178,7 +178,6 @@ export function ProofVerifier({ poolTitle, category, onConfirmed, submitting }: 
       }
       onConfirmed(json.url);
     } catch {
-      const fallback = `verified-upload-${Date.now()}`;
       setUploadError("Image hosting unavailable — submitting with a reference ID instead.");
       onConfirmed(fallback);
     }
