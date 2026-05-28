@@ -385,6 +385,7 @@ export function BNav() {
             { label: "Share a Plan", href: "/pools/create" },
             { label: "My Dashboard", href: "/dashboard/member" },
             { label: "Host Dashboard", href: "/dashboard/host" },
+            { label: "Profile", href: "/profile" },
           ].map((l) => (
             <Link
               key={l.href}
@@ -645,6 +646,7 @@ export function BFooter() {
         { label: "AI Bundle Planner", href: "/dashboard/member" },
         { label: "Browse Pools",    href: "/pools" },
         { label: "Host a Plan",     href: "/pools/create" },
+        { label: "Profile",         href: "/profile" },
       ],
     },
   ];
