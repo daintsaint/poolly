@@ -7,6 +7,7 @@ import { AnchorProvider, BN } from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import {
   getAssociatedTokenAddressSync,
+  createAssociatedTokenAccountInstruction,
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
@@ -227,15 +228,36 @@ export default function PoolDetailPage() {
     try {
       const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
       const program = getProgram(provider);
-      const escrowToken = getAssociatedTokenAddressSync(pool.mint, pool.publicKey, true);
-      const hostToken = getAssociatedTokenAddressSync(pool.mint, wallet.publicKey);
+      const escrowToken  = getAssociatedTokenAddressSync(pool.mint, pool.publicKey, true);
+      const hostToken    = getAssociatedTokenAddressSync(pool.mint, wallet.publicKey);
       const platformToken = getAssociatedTokenAddressSync(pool.mint, PLATFORM_WALLET);
+
+      // Create any missing ATAs as pre-instructions (payer = host)
+      const preInstructions = [];
+      const [hostInfo, platformInfo] = await Promise.all([
+        connection.getAccountInfo(hostToken),
+        connection.getAccountInfo(platformToken),
+      ]);
+      if (!hostInfo) {
+        preInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            wallet.publicKey, hostToken, wallet.publicKey, pool.mint,
+          )
+        );
+      }
+      if (!platformInfo) {
+        preInstructions.push(
+          createAssociatedTokenAccountInstruction(
+            wallet.publicKey, platformToken, PLATFORM_WALLET, pool.mint,
+          )
+        );
+      }
 
       await program.methods.releaseFunds().accounts({
         host: wallet.publicKey, pool: pool.publicKey,
         escrowToken, hostToken, platformToken,
         tokenProgram: TOKEN_PROGRAM_ID,
-      }).rpc();
+      }).preInstructions(preInstructions).rpc();
 
       setHostSuccess("Funds released to your wallet (6% platform fee deducted).");
       await loadPool();
