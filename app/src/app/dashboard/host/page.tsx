@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
-import { BNav, BTicker, BFooter, ServiceMark, PoolSlots } from "@/components/vault-ui";
+import { BNav, BTicker, BFooter, ServiceMark } from "@/components/vault-ui";
 import { DemandIntel } from "@/components/demand-intel";
 import {
   fetchHostPools,
@@ -342,12 +342,9 @@ export default function HostDashboard() {
                                   <ServiceMark id={svcId} size={32} radius={0} />
                                   <div>
                                     <p style={{ fontSize: 14, fontWeight: 600, color: "var(--b-paper)", marginBottom: 4 }}>{pool.title}</p>
-                                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                      <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-paper-40)", letterSpacing: "0.06em" }}>
-                                        {cat?.label ?? "OTHER"} · {pool.filledSlots}/{pool.maxSlots} SEATS
-                                      </p>
-                                      <PoolSlots filled={pool.filledSlots} total={pool.maxSlots} size={10} gap={3} />
-                                    </div>
+                                    <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-paper-40)", letterSpacing: "0.06em" }}>
+                                      {cat?.label ?? "OTHER"} · {pool.filledSlots}/{pool.maxSlots} SEATS
+                                    </p>
                                   </div>
                                   <span style={{ ...ss, background: "transparent", padding: "2px 8px", fontFamily: "var(--font-geist-mono), monospace", fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
                                     {poolStatusLabel(pool)}
