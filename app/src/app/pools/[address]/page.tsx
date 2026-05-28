@@ -857,8 +857,8 @@ export default function PoolDetailPage() {
                 </div>
               )}
 
-              {/* Release funds */}
-              {active && (
+              {/* Release funds — show whenever escrow has a balance, let the program enforce status */}
+              {!closed && (escrowBalance ?? 0) > 0 && (
                 <div>
                   <p style={{ fontFamily: "var(--font-geist), sans-serif", fontSize: 13, fontWeight: 600, color: "var(--b-paper)", marginBottom: 8 }}>
                     Release Escrow Funds
@@ -868,7 +868,7 @@ export default function PoolDetailPage() {
                   </p>
                   <button
                     onClick={releaseFunds}
-                    disabled={releasingFunds || !wallet || (escrowBalance ?? 0) === 0}
+                    disabled={releasingFunds || !wallet}
                     style={{
                       width: "100%",
                       background: "rgba(92,135,112,0.12)",
@@ -881,7 +881,7 @@ export default function PoolDetailPage() {
                       letterSpacing: "0.14em",
                       textTransform: "uppercase",
                       cursor: "pointer",
-                      opacity: (releasingFunds || !wallet || (escrowBalance ?? 0) === 0) ? 0.5 : 1,
+                      opacity: (releasingFunds || !wallet) ? 0.5 : 1,
                     }}
                   >
                     {releasingFunds ? "RELEASING…" : `RELEASE ${hostAmount} USDC → WALLET`}
