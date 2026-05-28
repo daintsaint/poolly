@@ -297,86 +297,92 @@ export default async function Home() {
             </a>
           </div>
 
-          {/* ── D: How it works — 3 step cards ── */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 0,
-              border: "1px solid var(--b-rule)",
-              textAlign: "left",
-            }}
-          >
+          {/* ── D: How it works — 3 step cards (matches mechanism style) ── */}
+          <div className="grid-3" style={{ gap: 0 }}>
             {[
               {
-                num: "01",
-                icon: "🔒",
-                title: "Join & lock.",
-                body: "Pick a pool, pay your share. Funds go straight into a Solana program-owned escrow — not Poolly's wallet.",
+                num: "I.",
+                who: "MEMBER",
+                title: "You lock funds.",
+                body: "Pick a pool, pay your share. Funds go directly into a Solana program-owned escrow — not Poolly's wallet. No one can touch it without the right conditions.",
+                note: "FUNDS LOCKED AT DEPOSIT · NO APPROVAL NEEDED",
               },
               {
-                num: "02",
-                icon: "⛓",
-                title: "Program holds.",
-                body: "The smart contract enforces every rule. No one touches the funds until the right conditions are met.",
+                num: "II.",
+                who: "PROGRAM",
+                title: "Math holds it.",
+                body: "The Solana program enforces every rule in its bytecode. There is no Poolly server between you and your money — only open-source code you can verify.",
+                note: "PROGRAM VERIFIED · OPEN SOURCE · DEVNET LIVE",
               },
               {
-                num: "03",
-                icon: "✓",
-                title: "Deliver, release.",
-                body: "Host submits proof of delivery. AI verifies it. 94% flows to the host, 6% to the protocol. On dispute, full refund.",
+                num: "III.",
+                who: "HOST",
+                title: "Deliver to release.",
+                body: "The host submits proof of delivery. AI verifies it. 94% of escrow flows to the host, 6% to the protocol. On dispute, everything reverses.",
+                note: "6% PROTOCOL FEE · ONLY ON RELEASE",
               },
             ].map((step, i) => (
               <div
                 key={step.num}
                 style={{
-                  padding: "clamp(20px, 4vw, 36px)",
+                  borderTop: "1px solid var(--b-rule)",
                   borderLeft: i > 0 ? "1px solid var(--b-rule)" : "none",
-                  background: "var(--b-ink-2)",
+                  padding: 40,
+                  textAlign: "left",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                  <span style={{ fontSize: 20 }}>{step.icon}</span>
-                  <p
-                    style={{
-                      fontFamily: "var(--font-geist-mono), monospace",
-                      fontSize: 9.5,
-                      color: "var(--b-gold)",
-                      letterSpacing: "0.22em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {step.num}
-                  </p>
-                </div>
+                <p
+                  style={{
+                    fontFamily: "var(--font-geist-mono), monospace",
+                    fontSize: 10.5,
+                    color: "var(--b-gold)",
+                    letterSpacing: "0.22em",
+                    textTransform: "uppercase",
+                    marginBottom: 8,
+                  }}
+                >
+                  {step.num} {step.who}
+                </p>
                 <p
                   className="b-serif"
-                  style={{ fontSize: 22, color: "var(--b-paper)", lineHeight: 1.2, marginBottom: 10 }}
+                  style={{ fontSize: 32, lineHeight: 1.1, color: "var(--b-paper)", marginBottom: 16 }}
                 >
                   {step.title}
                 </p>
-                <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--b-paper-60)" }}>
+                <p style={{ fontSize: 14, lineHeight: 1.65, color: "var(--b-paper-60)", marginBottom: 24 }}>
                   {step.body}
+                </p>
+                <p
+                  style={{
+                    fontFamily: "var(--font-geist-mono), monospace",
+                    fontSize: 9.5,
+                    color: "var(--b-paper-40)",
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    borderTop: "1px dashed var(--b-rule)",
+                    paddingTop: 14,
+                  }}
+                >
+                  {step.note}
                 </p>
               </div>
             ))}
           </div>
 
-          {/* ── Live stats bar (from chain) ── */}
+          {/* ── Trust signals bar (always-true facts, not usage metrics) ── */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+              gridTemplateColumns: "repeat(4, 1fr)",
               gap: 0,
               borderTop: "1px solid var(--b-rule)",
-              marginTop: 0,
             }}
           >
             {[
-              { num: stats.totalUsdcLocked,            label: "TOTAL IN ESCROW" },
-              { num: stats.totalMembers.toLocaleString(), label: "MEMBERS ACTIVE" },
-              { num: stats.activePools.toString(),       label: "ACTIVE POOLS" },
-              { num: "$0",                               label: "FUNDS LOST EVER" },
+              { num: "$0",    label: "FUNDS LOST EVER" },
+              { num: "0",     label: "EXPLOITS" },
+              { num: "100%",  label: "ON-CHAIN" },
+              { num: "6%",    label: "ONLY FEE · ON RELEASE" },
             ].map((s, i) => (
               <div
                 key={s.label}
