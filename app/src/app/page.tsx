@@ -402,39 +402,6 @@ export default async function Home() {
             ))}
           </div>
 
-          {/* ── Trust signals bar (always-true facts, not usage metrics) ── */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 0,
-              borderTop: "1px solid var(--b-rule)",
-            }}
-          >
-            {[
-              { num: "$0",    label: "FUNDS LOST EVER" },
-              { num: "0",     label: "EXPLOITS" },
-              { num: "100%",  label: "ON-CHAIN" },
-              { num: "6%",    label: "ONLY FEE · ON RELEASE" },
-            ].map((s, i) => (
-              <div
-                key={s.label}
-                style={{
-                  padding: "32px 0",
-                  borderRight: i < 3 ? "1px solid var(--b-rule)" : "none",
-                  textAlign: "center",
-                }}
-              >
-                <p
-                  className="b-serif"
-                  style={{ fontSize: 56, lineHeight: 1, color: "var(--b-paper)", marginBottom: 8 }}
-                >
-                  {s.num}
-                </p>
-                <p className="b-eyebrow">{s.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
