@@ -111,9 +111,11 @@ pub mod poolly {
             .unwrap();
         let host_amount = escrow_balance.checked_sub(fee).unwrap();
 
-        let pool_key = pool.key();
-        let seeds = &[POOL_SEED, pool_key.as_ref(), &[pool.bump]];
-        let signer_seeds = &[&seeds[..]];
+        let host_key = pool.host;
+        let title_bytes = pool.title.as_bytes().to_vec();
+        let bump = pool.bump;
+        let seeds: &[&[u8]] = &[POOL_SEED, host_key.as_ref(), &title_bytes, &[bump]];
+        let signer_seeds = &[seeds];
 
         // Transfer to host
         anchor_spl::token::transfer(
@@ -181,9 +183,11 @@ pub mod poolly {
 
         // Refund escrow balance back to host if any remains
         if escrow_balance > 0 {
-            let pool_key = pool.key();
-            let seeds = &[POOL_SEED, pool_key.as_ref(), &[pool.bump]];
-            let signer_seeds = &[&seeds[..]];
+            let host_key = pool.host;
+            let title_bytes = pool.title.as_bytes().to_vec();
+            let bump = pool.bump;
+            let seeds: &[&[u8]] = &[POOL_SEED, host_key.as_ref(), &title_bytes, &[bump]];
+            let signer_seeds = &[seeds];
 
             anchor_spl::token::transfer(
                 CpiContext::new_with_signer(
