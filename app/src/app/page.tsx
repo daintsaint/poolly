@@ -297,33 +297,42 @@ export default async function Home() {
             </a>
           </div>
 
-          {/* ── D: How it works — 3 step cards (matches mechanism style) ── */}
+          {/* ── Savings snapshots — 3 real examples ── */}
           <div className="grid-3" style={{ gap: 0 }}>
             {[
               {
-                num: "I.",
-                who: "MEMBER",
-                title: "You lock funds.",
-                body: "Pick a pool, pay your share. Funds go directly into a Solana program-owned escrow — not Poolly's wallet. No one can touch it without the right conditions.",
-                note: "FUNDS LOCKED AT DEPOSIT · NO APPROVAL NEEDED",
+                cat: "STREAMING",
+                id:  "netflix",
+                name: "Netflix Premium",
+                solo: "$22.99",
+                share: "$4.99",
+                seats: 4,
+                saveYr: "$216",
+                note: "SPLIT 4 WAYS · SAME 4K STREAMS",
               },
               {
-                num: "II.",
-                who: "PROGRAM",
-                title: "Math holds it.",
-                body: "The Solana program enforces every rule in its bytecode. There is no Poolly server between you and your money — only open-source code you can verify.",
-                note: "PROGRAM VERIFIED · OPEN SOURCE · DEVNET LIVE",
+                cat: "PRODUCTIVITY",
+                id:  "ms365",
+                name: "Microsoft 365",
+                solo: "$29.99",
+                share: "$1.69",
+                seats: 6,
+                saveYr: "$338",
+                note: "SPLIT 6 WAYS · FULL OFFICE SUITE",
               },
               {
-                num: "III.",
-                who: "HOST",
-                title: "Deliver to release.",
-                body: "The host submits proof of delivery. AI verifies it. 94% of escrow flows to the host, 6% to the protocol. On dispute, everything reverses.",
-                note: "6% PROTOCOL FEE · ONLY ON RELEASE",
+                cat: "CREATIVE",
+                id:  "adobe",
+                name: "Adobe Creative CC",
+                solo: "$59.99",
+                share: "$14.99",
+                seats: 4,
+                saveYr: "$540",
+                note: "SPLIT 4 WAYS · ALL APPS INCLUDED",
               },
-            ].map((step, i) => (
+            ].map((s, i) => (
               <div
-                key={step.num}
+                key={s.id}
                 style={{
                   borderTop: "1px solid var(--b-rule)",
                   borderLeft: i > 0 ? "1px solid var(--b-rule)" : "none",
@@ -338,19 +347,43 @@ export default async function Home() {
                     color: "var(--b-gold)",
                     letterSpacing: "0.22em",
                     textTransform: "uppercase",
-                    marginBottom: 8,
+                    marginBottom: 16,
                   }}
                 >
-                  {step.num} {step.who}
+                  {s.cat}
                 </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+                  <ServiceMark id={s.id} size={36} radius={0} />
+                  <p style={{ fontSize: 13, color: "var(--b-paper-60)" }}>{s.name}</p>
+                </div>
                 <p
                   className="b-serif"
-                  style={{ fontSize: 32, lineHeight: 1.1, color: "var(--b-paper)", marginBottom: 16 }}
+                  style={{ fontSize: 64, lineHeight: 1, color: "var(--b-paper)", marginBottom: 6 }}
                 >
-                  {step.title}
+                  {s.share}
                 </p>
-                <p style={{ fontSize: 14, lineHeight: 1.65, color: "var(--b-paper-60)", marginBottom: 24 }}>
-                  {step.body}
+                <p
+                  style={{
+                    fontFamily: "var(--font-geist-mono), monospace",
+                    fontSize: 11,
+                    color: "var(--b-paper-40)",
+                    marginBottom: 20,
+                  }}
+                >
+                  vs{" "}
+                  <span style={{ textDecoration: "line-through" }}>{s.solo}</span>{" "}
+                  solo
+                </p>
+                <p
+                  style={{
+                    fontFamily: "var(--font-geist-mono), monospace",
+                    fontSize: 13,
+                    color: "var(--b-gold)",
+                    fontWeight: 700,
+                    marginBottom: 20,
+                  }}
+                >
+                  +{s.saveYr}/yr saved
                 </p>
                 <p
                   style={{
@@ -363,7 +396,7 @@ export default async function Home() {
                     paddingTop: 14,
                   }}
                 >
-                  {step.note}
+                  {s.note}
                 </p>
               </div>
             ))}
