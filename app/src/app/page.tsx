@@ -1,21 +1,8 @@
 import Link from "next/link";
-import { BNav, BTicker, BEscrowSpecimen, BFooter, ServiceMark, PoolSlots } from "@/components/vault-ui";
+import { BNav, BTicker, BFooter, ServiceMark, PoolSlots } from "@/components/vault-ui";
 import { DemandIntel } from "@/components/demand-intel";
 import { BundleOptimizer } from "@/components/bundle-optimizer";
-
-/* ─── Static catalog data ─── */
-const CATALOG_ROW_1 = [
-  { id: "netflix",  name: "Netflix Premium", host: "maya.sol",   price: "$4.99", retail: "$22.99", savings: "+$216/yr", seats: 4, filled: 3, accent: true  },
-  { id: "spotify",  name: "Spotify Family",  host: "jin.sol",    price: "$3.49", retail: "$17.99", savings: "+$174/yr", seats: 5, filled: 4, accent: false },
-  { id: "ms365",    name: "Microsoft 365",   host: "eli.sol",    price: "$1.69", retail: "$29.99", savings: "+$338/yr", seats: 6, filled: 5, accent: false },
-  { id: "disney",   name: "Disney+",         host: "priya.sol",  price: "$3.49", retail: "$13.99", savings: "+$126/yr", seats: 4, filled: 2, accent: false },
-];
-const CATALOG_ROW_2 = [
-  { id: "icloud",  name: "iCloud+ 2TB",  host: "tomoki.sol", price: "$1.99", retail: "$9.99",  savings: "+$96/yr",  seats: 5, filled: 3, accent: false },
-  { id: "nyt",     name: "NYT All Access",host: "sara.sol",   price: "$6.25", retail: "$25.00", savings: "+$225/yr", seats: 4, filled: 4, accent: false },
-  { id: "adobe",   name: "Adobe CC",     host: "dev.sol",    price: "$14.99",retail: "$59.99", savings: "+$540/yr", seats: 4, filled: 2, accent: false },
-  { id: "peloton", name: "Peloton App",  host: "kai.sol",    price: "$4.00", retail: "$24.00", savings: "+$240/yr", seats: 6, filled: 5, accent: false },
-];
+import { fetchHomepageData, type HomepagePool, type ActivityEvent } from "@/lib/pool-server";
 
 const MATH_TABLE = [
   { id: "netflix",  name: "Netflix Premium",   retail: "$22.99", share: "$4.99",  saved: "$216",  seats: 4 },
@@ -26,125 +13,199 @@ const MATH_TABLE = [
   { id: "peloton",  name: "Peloton App",       retail: "$24.00", share: "$4.00",  saved: "$240",  seats: 6 },
 ];
 
-const LEDGER_ROWS = [
-  { time: "2m ago",   actor: "maya.sol",   event: "RELEASED",  plan: "Netflix Premium",  amount: "$14.97", tx: "3xK9…vMa2" },
-  { time: "14m ago",  actor: "jin.sol",    event: "LOCKED",    plan: "Spotify Family",   amount: "$3.49",  tx: "7pQr…nF8w" },
-  { time: "1h ago",   actor: "priya.sol",  event: "JOINED",    plan: "Disney+",          amount: "$3.49",  tx: "9mTv…kL3x" },
-  { time: "3h ago",   actor: "eli.sol",    event: "RELEASED",  plan: "MS365",            amount: "$8.45",  tx: "2vBn…rA6y" },
-  { time: "6h ago",   actor: "tomoki.sol", event: "LOCKED",    plan: "iCloud+ 2TB",      amount: "$1.99",  tx: "5sWp…cD1m" },
-  { time: "12h ago",  actor: "kai.sol",    event: "JOINED",    plan: "Peloton App",      amount: "$4.00",  tx: "8qLd…tE9n" },
-];
+/* ─── BCatalogCard — accepts live HomepagePool ─── */
+function BCatalogCard({ item, accent }: { item: HomepagePool; accent?: boolean }) {
+  const statusColor = item.status === "active" ? "var(--b-emerald)"
+    : item.status === "pending" ? "var(--b-gold)"
+    : "var(--b-paper-40)";
 
-/* ─── BCatalogCard (server-safe) ─── */
-function BCatalogCard({ item, accent }: { item: typeof CATALOG_ROW_1[0]; accent?: boolean }) {
   return (
-    <div
-      className="lift"
-      style={{
-        background: accent ? "var(--b-paper)" : "var(--b-ink-3)",
-        border: `1px solid ${accent ? "transparent" : "var(--b-rule)"}`,
-        padding: 24,
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-        minHeight: 220,
-      }}
+    <Link
+      href={`/pools/${item.address}`}
+      style={{ textDecoration: "none" }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-        <ServiceMark id={item.id} size={40} radius={0} />
-        <span
-          style={{
-            fontFamily: "var(--font-geist-mono), monospace",
-            fontSize: 9.5,
-            color: accent ? "var(--b-ink)" : "var(--b-gold)",
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            border: `1px solid ${accent ? "rgba(12,11,9,0.15)" : "rgba(201,162,79,0.3)"}`,
-            padding: "2px 8px",
-          }}
-        >
-          STREAMING
-        </span>
-      </div>
+      <div
+        className="lift"
+        style={{
+          background: accent ? "var(--b-paper)" : "var(--b-ink-3)",
+          border: `1px solid ${accent ? "transparent" : "var(--b-rule)"}`,
+          padding: 24,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+          minHeight: 220,
+          cursor: "pointer",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <ServiceMark id={item.svcId} size={40} radius={0} />
+          <span
+            style={{
+              fontFamily: "var(--font-geist-mono), monospace",
+              fontSize: 9.5,
+              color: accent ? "var(--b-ink)" : statusColor,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              border: `1px solid ${accent ? "rgba(12,11,9,0.15)" : "rgba(201,162,79,0.3)"}`,
+              padding: "2px 8px",
+            }}
+          >
+            {item.status.toUpperCase()}
+          </span>
+        </div>
 
-      <div>
-        <p
-          className="b-serif"
-          style={{
-            fontSize: 28,
-            lineHeight: 1.1,
-            color: accent ? "var(--b-ink)" : "var(--b-paper)",
-            marginBottom: 4,
-          }}
-        >
-          {item.name}
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--font-geist-mono), monospace",
-            fontSize: 10.5,
-            color: accent ? "rgba(12,11,9,0.5)" : "var(--b-paper-40)",
-            letterSpacing: "0.08em",
-          }}
-        >
-          HOST · {item.host}
-        </p>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: "auto" }}>
         <div>
           <p
-            style={{
-              fontFamily: "var(--font-geist-mono), monospace",
-              fontSize: 9.5,
-              color: accent ? "rgba(12,11,9,0.5)" : "var(--b-paper-40)",
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              marginBottom: 3,
-            }}
-          >
-            YOUR SHARE
-          </p>
-          <p
             className="b-serif"
-            style={{ fontSize: 36, lineHeight: 1, color: accent ? "var(--b-ink)" : "var(--b-paper)" }}
+            style={{
+              fontSize: 28,
+              lineHeight: 1.1,
+              color: accent ? "var(--b-ink)" : "var(--b-paper)",
+              marginBottom: 4,
+            }}
           >
-            {item.price}
+            {item.title}
           </p>
           <p
             style={{
               fontFamily: "var(--font-geist-mono), monospace",
-              fontSize: 10,
-              color: accent ? "rgba(12,11,9,0.45)" : "var(--b-paper-40)",
-              marginTop: 3,
+              fontSize: 10.5,
+              color: accent ? "rgba(12,11,9,0.5)" : "var(--b-paper-40)",
+              letterSpacing: "0.08em",
             }}
           >
-            VS RETAIL{" "}
-            <span style={{ textDecoration: "line-through" }}>{item.retail}</span>
+            {item.categoryLabel.toUpperCase()}
           </p>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <PoolSlots filled={item.filled} total={item.seats} size={14} gap={4} />
-          <p
-            style={{
-              fontFamily: "var(--font-geist-mono), monospace",
-              fontSize: 9.5,
-              color: accent ? "rgba(12,11,9,0.45)" : "var(--b-paper-40)",
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              marginTop: 4,
-            }}
-          >
-            {item.filled}/{item.seats} CLAIMED
-          </p>
+
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginTop: "auto" }}>
+          <div>
+            <p
+              style={{
+                fontFamily: "var(--font-geist-mono), monospace",
+                fontSize: 9.5,
+                color: accent ? "rgba(12,11,9,0.5)" : "var(--b-paper-40)",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                marginBottom: 3,
+              }}
+            >
+              YOUR SHARE
+            </p>
+            <p
+              className="b-serif"
+              style={{ fontSize: 36, lineHeight: 1, color: accent ? "var(--b-ink)" : "var(--b-paper)" }}
+            >
+              {item.price}
+            </p>
+            <p
+              style={{
+                fontFamily: "var(--font-geist-mono), monospace",
+                fontSize: 10,
+                color: accent ? "rgba(12,11,9,0.45)" : "var(--b-gold)",
+                marginTop: 3,
+              }}
+            >
+              {item.savingsYr}
+            </p>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <PoolSlots filled={item.filled} total={item.seats} size={14} gap={4} />
+            <p
+              style={{
+                fontFamily: "var(--font-geist-mono), monospace",
+                fontSize: 9.5,
+                color: accent ? "rgba(12,11,9,0.45)" : "var(--b-paper-40)",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                marginTop: 4,
+              }}
+            >
+              {item.filled}/{item.seats} CLAIMED
+            </p>
+          </div>
         </div>
       </div>
+    </Link>
+  );
+}
+
+/* ─── ActivityRow — live on-chain event ─── */
+function ActivityRow({ row }: { row: ActivityEvent }) {
+  const eventColor =
+    row.event === "RELEASED" ? "var(--b-emerald)"
+    : row.event === "JOINED" ? "var(--b-gold)"
+    : "var(--b-paper-40)";
+  const eventBg =
+    row.event === "RELEASED" ? "rgba(92,135,112,0.08)"
+    : row.event === "JOINED" ? "rgba(201,162,79,0.06)"
+    : "rgba(237,230,214,0.04)";
+  const eventBorder =
+    row.event === "RELEASED" ? "rgba(92,135,112,0.4)"
+    : row.event === "JOINED" ? "rgba(201,162,79,0.35)"
+    : "var(--b-rule)";
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "0.6fr 1fr 0.9fr 1.2fr 0.7fr 0.8fr",
+        gap: 0,
+        borderBottom: "1px solid var(--b-rule)",
+        padding: "16px 0",
+        alignItems: "center",
+        minWidth: 560,
+      }}
+    >
+      <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)" }}>
+        {row.time}
+      </p>
+      <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-60)" }}>
+        {row.actor}
+      </p>
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          padding: "3px 8px",
+          border: `1px solid ${eventBorder}`,
+          background: eventBg,
+          fontFamily: "var(--font-geist-mono), monospace",
+          fontSize: 9.5,
+          color: eventColor,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          width: "fit-content",
+        }}
+      >
+        {row.event}
+      </span>
+      <p style={{ fontSize: 13, color: "var(--b-paper)" }}>{row.plan}</p>
+      <p className="b-serif" style={{ fontSize: 18, color: "var(--b-paper)" }}>{row.amount}</p>
+      <a
+        href={row.solscanUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          fontFamily: "var(--font-geist-mono), monospace",
+          fontSize: 10.5,
+          color: "var(--b-gold)",
+          textDecoration: "none",
+          letterSpacing: "0.06em",
+        }}
+      >
+        view ↗
+      </a>
     </div>
   );
 }
 
 /* ─── Main Page ─── */
-export default function Home() {
+export default async function Home() {
+  const { pools, activity, stats } = await fetchHomepageData();
+  const row1 = pools.slice(0, 4);
+  const row2 = pools.slice(4, 8);
+
   return (
     <div>
       <BNav />
@@ -236,24 +297,86 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Escrow specimen */}
-          <BEscrowSpecimen />
+          {/* ── D: How it works — 3 step cards ── */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: 0,
+              border: "1px solid var(--b-rule)",
+              textAlign: "left",
+            }}
+          >
+            {[
+              {
+                num: "01",
+                icon: "🔒",
+                title: "Join & lock.",
+                body: "Pick a pool, pay your share. Funds go straight into a Solana program-owned escrow — not Poolly's wallet.",
+              },
+              {
+                num: "02",
+                icon: "⛓",
+                title: "Program holds.",
+                body: "The smart contract enforces every rule. No one touches the funds until the right conditions are met.",
+              },
+              {
+                num: "03",
+                icon: "✓",
+                title: "Deliver, release.",
+                body: "Host submits proof of delivery. AI verifies it. 94% flows to the host, 6% to the protocol. On dispute, full refund.",
+              },
+            ].map((step, i) => (
+              <div
+                key={step.num}
+                style={{
+                  padding: "clamp(20px, 4vw, 36px)",
+                  borderLeft: i > 0 ? "1px solid var(--b-rule)" : "none",
+                  background: "var(--b-ink-2)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                  <span style={{ fontSize: 20 }}>{step.icon}</span>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-geist-mono), monospace",
+                      fontSize: 9.5,
+                      color: "var(--b-gold)",
+                      letterSpacing: "0.22em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {step.num}
+                  </p>
+                </div>
+                <p
+                  className="b-serif"
+                  style={{ fontSize: 22, color: "var(--b-paper)", lineHeight: 1.2, marginBottom: 10 }}
+                >
+                  {step.title}
+                </p>
+                <p style={{ fontSize: 13, lineHeight: 1.65, color: "var(--b-paper-60)" }}>
+                  {step.body}
+                </p>
+              </div>
+            ))}
+          </div>
 
-          {/* Proof stats bar */}
+          {/* ── Live stats bar (from chain) ── */}
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
               gap: 0,
               borderTop: "1px solid var(--b-rule)",
-              marginTop: 56,
+              marginTop: 0,
             }}
           >
             {[
-              { num: "$1.84M", label: "TOTAL IN ESCROW" },
-              { num: "5,917",  label: "MEMBERS ACTIVE" },
-              { num: "$0",     label: "FUNDS LOST EVER" },
-              { num: "0",      label: "DISPUTES OPEN" },
+              { num: stats.totalUsdcLocked,            label: "TOTAL IN ESCROW" },
+              { num: stats.totalMembers.toLocaleString(), label: "MEMBERS ACTIVE" },
+              { num: stats.activePools.toString(),       label: "ACTIVE POOLS" },
+              { num: "$0",                               label: "FUNDS LOST EVER" },
             ].map((s, i) => (
               <div
                 key={s.label}
@@ -372,16 +495,38 @@ export default function Home() {
             <em style={{ color: "var(--b-gold)", fontStyle: "italic" }}>curated weekly.</em>
           </h2>
 
-          <div className="pool-grid" style={{ marginBottom: 2 }}>
-            {CATALOG_ROW_1.map((item) => (
-              <BCatalogCard key={item.id} item={item} accent={item.accent} />
-            ))}
-          </div>
-          <div className="pool-grid">
-            {CATALOG_ROW_2.map((item) => (
-              <BCatalogCard key={item.id} item={item} />
-            ))}
-          </div>
+          {row1.length > 0 ? (
+            <>
+              <div className="pool-grid" style={{ marginBottom: 2 }}>
+                {row1.map((item, i) => (
+                  <BCatalogCard key={item.address} item={item} accent={i === 0} />
+                ))}
+              </div>
+              {row2.length > 0 && (
+                <div className="pool-grid">
+                  {row2.map((item) => (
+                    <BCatalogCard key={item.address} item={item} />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            /* Empty state — no on-chain pools yet */
+            <div
+              style={{
+                border: "1px solid var(--b-rule)",
+                padding: "64px 32px",
+                textAlign: "center",
+              }}
+            >
+              <p className="b-serif" style={{ fontSize: 28, color: "var(--b-paper-40)", marginBottom: 12 }}>
+                No pools yet.
+              </p>
+              <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)", letterSpacing: "0.12em" }}>
+                BE THE FIRST HOST →
+              </p>
+            </div>
+          )}
 
           <div style={{ textAlign: "center", marginTop: 40 }}>
             <Link
@@ -556,75 +701,15 @@ export default function Home() {
             ))}
           </div>
 
-          {LEDGER_ROWS.map((row, i) => (
-            <div
-              key={i}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "0.6fr 1fr 0.9fr 1.2fr 0.7fr 0.8fr",
-                gap: 0,
-                borderBottom: "1px solid var(--b-rule)",
-                padding: "16px 0",
-                alignItems: "center",
-                minWidth: 560,
-              }}
-            >
-              <p
-                style={{
-                  fontFamily: "var(--font-geist-mono), monospace",
-                  fontSize: 11,
-                  color: "var(--b-paper-40)",
-                }}
-              >
-                {row.time}
+          {activity.length > 0 ? (
+            activity.map((row, i) => <ActivityRow key={i} row={row} />)
+          ) : (
+            <div style={{ padding: "32px 0", textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 11, color: "var(--b-paper-40)", letterSpacing: "0.12em" }}>
+                NO ACTIVITY YET
               </p>
-              <p
-                style={{
-                  fontFamily: "var(--font-geist-mono), monospace",
-                  fontSize: 11,
-                  color: "var(--b-paper-60)",
-                }}
-              >
-                {row.actor}
-              </p>
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  padding: "3px 8px",
-                  border: `1px solid ${row.event === "RELEASED" ? "rgba(92,135,112,0.4)" : "rgba(201,162,79,0.35)"}`,
-                  background: row.event === "RELEASED" ? "rgba(92,135,112,0.08)" : "rgba(201,162,79,0.06)",
-                  fontFamily: "var(--font-geist-mono), monospace",
-                  fontSize: 9.5,
-                  color: row.event === "RELEASED" ? "var(--b-emerald)" : "var(--b-gold)",
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  width: "fit-content",
-                }}
-              >
-                {row.event}
-              </span>
-              <p style={{ fontSize: 13, color: "var(--b-paper)" }}>{row.plan}</p>
-              <p
-                className="b-serif"
-                style={{ fontSize: 18, color: "var(--b-paper)" }}
-              >
-                {row.amount}
-              </p>
-              <a
-                href="#"
-                style={{
-                  fontFamily: "var(--font-geist-mono), monospace",
-                  fontSize: 10.5,
-                  color: "var(--b-gold)",
-                  textDecoration: "none",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                {row.tx} ↗
-              </a>
             </div>
-          ))}
+          )}
           </div>{/* /table-scroll */}
         </div>
       </section>
