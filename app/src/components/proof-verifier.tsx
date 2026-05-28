@@ -403,17 +403,48 @@ export function ProofVerifier({ poolTitle, category, onConfirmed, submitting }: 
 
       {/* Errors */}
       {verifyError && (
-        <p style={{
-          fontFamily: "var(--font-geist-mono), monospace",
-          fontSize: 11,
-          color: "var(--b-rust)",
-          letterSpacing: "0.06em",
-          padding: "8px 12px",
+        <div style={{
+          padding: "10px 14px",
           border: "1px solid rgba(181,86,62,0.3)",
           background: "rgba(181,86,62,0.06)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
         }}>
-          {verifyError}
-        </p>
+          <p style={{
+            fontFamily: "var(--font-geist-mono), monospace",
+            fontSize: 11,
+            color: "var(--b-rust)",
+            letterSpacing: "0.06em",
+          }}>
+            {verifyError}
+          </p>
+          {/* Allow bypassing AI when verification service is unavailable */}
+          {activeUri && (
+            <button
+              onClick={handleConfirm}
+              disabled={submitting || isUploading}
+              title="Submit proof without AI verification"
+              style={{
+                flexShrink: 0,
+                padding: "6px 12px",
+                background: "transparent",
+                border: "1px solid rgba(201,162,79,0.4)",
+                color: "var(--b-gold)",
+                fontFamily: "var(--font-geist-mono), monospace",
+                fontSize: 10,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                cursor: submitting || isUploading ? "wait" : "pointer",
+                opacity: submitting || isUploading ? 0.5 : 1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {isUploading ? "UPLOADING…" : submitting ? "SUBMITTING…" : "SKIP & SUBMIT →"}
+            </button>
+          )}
+        </div>
       )}
 
       {uploadError && (
