@@ -248,7 +248,7 @@ export default function HostDashboard() {
           {publicKey && !loading && (
             <>
               {/* KPI strip */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, marginBottom: 40 }}>
+              <div className="kpi-strip-4" style={{ marginBottom: 40 }}>
                 {[
                   { label: "EARNED ALL-TIME",  value: `$${earnedAllTime.toFixed(2)}`,  sub: "94% of all releases",         gold: true  },
                   { label: "LIVE POOLS",        value: String(livePools),              sub: `${pools.length} total hosted`, gold: false },

@@ -37,6 +37,28 @@ export default function CreatePoolPage() {
     setError("");
     setLoading(true);
 
+    // Pre-flight spam guard: check if wallet is allowed to create another pool
+    if (wallet) {
+      try {
+        const intentRes = await fetch("/api/pool-create-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wallet: wallet.publicKey.toBase58() }),
+        });
+        if (intentRes.ok) {
+          const intentData = await intentRes.json();
+          if (intentData.allowed === false) {
+            setError("You've created 3 pools in the last 24 hours. Please wait before creating another.");
+            setLoading(false);
+            return;
+          }
+        }
+        // If API isn't reachable or returns non-ok, fail open and allow submission
+      } catch {
+        // Network error — fail open for UX
+      }
+    }
+
     try {
       const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
       const program = getProgram(provider);

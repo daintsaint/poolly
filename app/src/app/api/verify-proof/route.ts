@@ -3,12 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { aiLimiter, getIp } from "@/lib/ratelimit";
 
 const CATEGORY_HINTS: Record<number, string> = {
-  0: "streaming service (Netflix, Spotify, Disney+, etc.) — look for account page, subscription plan, active status, and member slots",
-  1: "productivity tool (Notion, Microsoft 365, Google Workspace, etc.) — check plan type, license count, billing status",
-  2: "fitness service — check membership status, active subscription screen, or booking confirmation",
-  3: "local service (cleaning, delivery, etc.) — look for receipt, completion photo, booking confirmation, or before/after photos",
-  4: "professional tool (Adobe, Figma, GitHub, etc.) — check subscription/plan page, seats, billing",
-  5: "subscription service — verify active status and plan details",
+  0: "streaming service (Netflix, Spotify, Disney+, Apple TV+, etc.) — must show: active subscription status, plan name/tier, billing date within last 30 days or renewal date, account email or profile name",
+  1: "productivity/office tool (Notion, Microsoft 365, Google Workspace, etc.) — must show: active license, plan type, number of seats/users, billing status",
+  2: "fitness service (Peloton, gym membership, etc.) — must show: active membership, member name or account, recent activity or membership status",
+  3: "local/delivery service — must show: completed delivery receipt, booking confirmation, or before/after photo with date",
+  4: "professional tool (Adobe CC, Figma, GitHub, Claude, ChatGPT, etc.) — must show: active subscription plan, billing cycle, seat count if applicable, account email",
+  5: "subscription service — must show: active subscription status, plan name, billing date",
 };
 
 export interface VerifyResult {
@@ -56,12 +56,15 @@ Category: ${categoryHint}
 
 Analyze the image and determine if it is valid proof that the host has actually delivered the service this billing cycle.
 
-Look for:
-- Active subscription/account status
+REQUIREMENTS — all must be met for verified=true:
+- Active subscription/account status must be clearly visible
 - Correct plan/tier matching the pool description
-- Recent date or timestamp if visible
-- Clear evidence of service delivery (not a generic screenshot)
+- The screenshot must show a CURRENT billing date (within the last 35 days) or upcoming renewal date. Screenshots without any date are insufficient.
+- The service name visible in the screenshot must match or be consistent with the pool title: "${poolTitle}"
+- Clear evidence of service delivery (not a generic or promotional screenshot)
 - No obvious signs of editing or fabrication
+
+If confidence is below 60, set verified=false regardless of other signals.
 
 Respond ONLY with a JSON object (no markdown, no explanation outside the JSON):
 {
@@ -80,6 +83,11 @@ Respond ONLY with a JSON object (no markdown, no explanation outside the JSON):
     const text = response.choices[0]?.message?.content?.trim() ?? "";
     const cleaned = text.replace(/^```json\s*/i, "").replace(/\s*```$/, "");
     const result: VerifyResult = JSON.parse(cleaned);
+
+    // Enforce confidence threshold — reject if below 60 regardless of AI verdict
+    if (result.confidence < 60) {
+      result.verified = false;
+    }
 
     return NextResponse.json(result);
   } catch (err) {

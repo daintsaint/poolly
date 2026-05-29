@@ -8,6 +8,7 @@ type Props = {
   category: number;
   onConfirmed: (uri: string) => void;
   submitting: boolean;
+  poolAddress?: string;
 };
 
 type Phase = "idle" | "verifying" | "uploading" | "done";
@@ -45,7 +46,7 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function ProofVerifier({ poolTitle, category, onConfirmed, submitting }: Props) {
+export function ProofVerifier({ poolTitle, category, onConfirmed, submitting, poolAddress }: Props) {
   const [inputMode, setInputMode] = useState<InputMode>("file");
   const [urlInput, setUrlInput] = useState("");
 
@@ -143,6 +144,29 @@ export function ProofVerifier({ poolTitle, category, onConfirmed, submitting }: 
       setVerifyError("Could not reach verification service.");
       setPhase("idle");
     }
+  }
+
+  // --- Override logging ---
+
+  async function handleOverride() {
+    logOverride(activeUri);
+    await handleConfirm();
+  }
+
+  function logOverride(uri: string) {
+    // Fire-and-forget: log the host override/skip to the server
+    fetch("/api/log-override", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pool: poolAddress ?? poolTitle,
+        wallet: "unknown",
+        reason: "host_override",
+        proofUri: uri || undefined,
+      }),
+    }).catch(() => {
+      // Silently ignore — logging is best-effort
+    });
   }
 
   // --- On-chain submission ---
@@ -422,7 +446,7 @@ export function ProofVerifier({ poolTitle, category, onConfirmed, submitting }: 
           {/* Allow bypassing AI when verification service is unavailable */}
           {activeUri && (
             <button
-              onClick={handleConfirm}
+              onClick={handleOverride}
               disabled={submitting || isUploading}
               title="Submit proof without AI verification"
               style={{
@@ -585,7 +609,7 @@ export function ProofVerifier({ poolTitle, category, onConfirmed, submitting }: 
                   TRY AGAIN
                 </button>
                 <button
-                  onClick={handleConfirm}
+                  onClick={handleOverride}
                   disabled={submitting || isUploading}
                   title="Submit anyway, overriding AI verdict"
                   style={{

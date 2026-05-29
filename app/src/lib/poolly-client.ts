@@ -28,6 +28,7 @@ export type PoolAccount = {
   nextChargeAt: BN;
   totalCycles: number;
   lastProofUri: string;
+  isDisputed: boolean;
 };
 
 export function getProgram(provider: AnchorProvider): Program<Poolly> {

@@ -23,6 +23,11 @@ export const CATEGORIES = [
 export const PLATFORM_FEE_BPS = 600;
 
 // Deployer/platform wallet — receives the 6% fee on fund releases
+// TODO: Replace with a multisig wallet before mainnet deployment
 export const PLATFORM_WALLET = new PublicKey(
   "DXt2nNnGAg9Budk7WZ1ns5n7PLi4351hFrdPte2eMVHn"
+);
+
+export const ADMIN_PUBKEY = new PublicKey(
+  "HR1eiDbC9NKtUtLLfX4FS2DXnPA3NmZyYhcAdgg95W6U"
 );

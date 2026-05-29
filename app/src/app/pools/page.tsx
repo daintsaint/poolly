@@ -374,10 +374,10 @@ function PoolsInner() {
             }}
           >
             <p className="b-serif" style={{ fontSize: 32, color: "var(--b-paper-60)", marginBottom: 16 }}>
-              No plans found.
+              {search ? "No pools match your search." : "No plans found."}
             </p>
             <p className="b-eyebrow" style={{ marginBottom: 24 }}>
-              {category !== null ? "TRY A DIFFERENT CATEGORY" : "BE THE FIRST TO HOST ONE"}
+              {search ? "TRY A DIFFERENT SEARCH TERM OR CATEGORY" : category !== null ? "TRY A DIFFERENT CATEGORY" : "BE THE FIRST TO HOST ONE"}
             </p>
             <Link
               href="/pools/create"
@@ -400,7 +400,7 @@ function PoolsInner() {
         ) : (
           <>
             <p className="b-eyebrow" style={{ marginBottom: 20 }}>
-              ALL PLANS · {filtered.length} AVAILABLE
+              ALL PLANS · {filtered.length} {filtered.length === 1 ? "POOL" : "POOLS"} FOUND
             </p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1 }}>
               {filtered.map((pool, i) => (

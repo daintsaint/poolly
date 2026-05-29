@@ -303,6 +303,13 @@ body {
 .escrow-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
 @media (max-width: 700px) { .escrow-grid { grid-template-columns: 1fr; gap: 20px; } }
 
+/* ── KPI strip: 4-col on desktop → 2x2 on mobile ── */
+.kpi-strip-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; }
+@media (max-width: 768px) {
+  .grid-2-sidebar { grid-template-columns: 1fr !important; }
+  .kpi-strip-4 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
 /* ── Service badge (legacy) ── */
 .service-badge {
   display: inline-flex;

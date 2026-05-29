@@ -36,6 +36,9 @@ export const aiLimiter = makeRatelimiter(20, 60);
 /** Profile writes: 30 per 60 s per IP (generous — fast UX) */
 export const profileLimiter = makeRatelimiter(30, 60);
 
+/** Pool creation intent: 3 per wallet per 24 hours */
+export const createPoolLimiter = makeRatelimiter(3, 86400);
+
 /** Extract best-effort IP from Next.js request headers */
 export function getIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");

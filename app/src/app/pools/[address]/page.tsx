@@ -124,6 +124,23 @@ export default function PoolDetailPage() {
   const [confirmClose, setConfirmClose] = useState(false);
   const [activeTab, setActiveTab] = useState("Members");
 
+  // Leave pool
+  const [leavingPool, setLeavingPool] = useState(false);
+  const [leaveConfirm, setLeaveConfirm] = useState(false);
+  const [leaveError, setLeaveError] = useState("");
+
+  // Claim refund
+  const [claimingRefund, setClaimingRefund] = useState(false);
+  const [claimError, setClaimError] = useState("");
+
+  // Flag dispute
+  const [flaggingDispute, setFlaggingDispute] = useState(false);
+  const [disputeConfirm, setDisputeConfirm] = useState(false);
+  const [disputeError, setDisputeError] = useState("");
+
+  // ToS acceptance
+  const [tosAccepted, setTosAccepted] = useState(false);
+
   // Display name
   const [nameInput, setNameInput] = useState("");
   const [nameSaving, setNameSaving] = useState(false);
@@ -139,7 +156,7 @@ export default function PoolDetailPage() {
       const provider = new AnchorProvider(connection, {} as never, {});
       const program = getProgram(provider);
       const poolKey = new PublicKey(address);
-      const data = await program.account.pool.fetch(poolKey);
+      const data = await ( program.account as any).pool.fetch(poolKey);
       const poolAcc: PoolAccount = { publicKey: poolKey, ...data };
       setPool(poolAcc);
 
@@ -184,7 +201,7 @@ export default function PoolDetailPage() {
       const memberRecord = deriveMemberPda(pool.publicKey, wallet.publicKey);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sig = await program.methods.joinPool().accounts({
+      const sig = await program.methods.join_pool().accounts({
         pool: pool.publicKey, member: wallet.publicKey,
         memberToken, escrowToken, memberRecord,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -209,7 +226,7 @@ export default function PoolDetailPage() {
     try {
       const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
       const program = getProgram(provider);
-      await program.methods.submitProof(resolvedUri.trim())
+      await program.methods.submit_proof(resolvedUri.trim())
         .accounts({ host: wallet.publicKey, pool: pool.publicKey }).rpc();
       setProofUri("");
       setHostSuccess("Proof submitted — cycle recorded on-chain.");
@@ -253,7 +270,7 @@ export default function PoolDetailPage() {
         );
       }
 
-      await program.methods.releaseFunds().accounts({
+      await program.methods.release_funds().accounts({
         host: wallet.publicKey, pool: pool.publicKey,
         escrowToken, hostToken, platformToken,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -278,19 +295,97 @@ export default function PoolDetailPage() {
       const escrowToken = getAssociatedTokenAddressSync(pool.mint, pool.publicKey, true);
       const hostToken = getAssociatedTokenAddressSync(pool.mint, wallet.publicKey);
 
-      await program.methods.closePool().accounts({
+      await program.methods.close_pool().accounts({
         host: wallet.publicKey, pool: pool.publicKey,
         escrowToken, hostToken,
         tokenProgram: TOKEN_PROGRAM_ID,
       }).rpc();
 
       setConfirmClose(false);
-      setHostSuccess("Plan closed. Any remaining escrow funds returned to you.");
+      setHostSuccess("Plan closed. Escrow balance is frozen — members may claim their deposits back.");
       await loadPool();
     } catch (e: unknown) {
       setHostError(e instanceof Error ? e.message : "Transaction failed");
     } finally {
       setClosingPool(false);
+    }
+  }
+
+  async function leavePool() {
+    if (!wallet || !pool) return;
+    setLeavingPool(true);
+    setLeaveError("");
+    try {
+      const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
+      const program = getProgram(provider);
+      const escrowToken = getAssociatedTokenAddressSync(pool.mint, pool.publicKey, true);
+      const memberToken = getAssociatedTokenAddressSync(pool.mint, wallet.publicKey);
+      const memberRecord = deriveMemberPda(pool.publicKey, wallet.publicKey);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (program.methods as any).leave_pool().accounts({
+        member: wallet.publicKey,
+        pool: pool.publicKey,
+        memberToken,
+        escrowToken,
+        memberRecord,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      }).rpc();
+      setLeaveConfirm(false);
+      await loadPool();
+    } catch (e: unknown) {
+      setLeaveError(e instanceof Error ? e.message : "Transaction failed");
+    } finally {
+      setLeavingPool(false);
+    }
+  }
+
+  async function claimRefund() {
+    if (!wallet || !pool) return;
+    setClaimingRefund(true);
+    setClaimError("");
+    try {
+      const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
+      const program = getProgram(provider);
+      const escrowToken = getAssociatedTokenAddressSync(pool.mint, pool.publicKey, true);
+      const memberToken = getAssociatedTokenAddressSync(pool.mint, wallet.publicKey);
+      const memberRecord = deriveMemberPda(pool.publicKey, wallet.publicKey);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (program.methods as any).claim_refund().accounts({
+        member: wallet.publicKey,
+        pool: pool.publicKey,
+        memberToken,
+        escrowToken,
+        memberRecord,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      }).rpc();
+      await loadPool();
+    } catch (e: unknown) {
+      setClaimError(e instanceof Error ? e.message : "Transaction failed");
+    } finally {
+      setClaimingRefund(false);
+    }
+  }
+
+  async function flagDispute() {
+    if (!wallet || !pool) return;
+    setFlaggingDispute(true);
+    setDisputeError("");
+    try {
+      const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
+      const program = getProgram(provider);
+      const memberRecord = deriveMemberPda(pool.publicKey, wallet.publicKey);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (program.methods as any).flag_dispute().accounts({
+        member: wallet.publicKey,
+        pool: pool.publicKey,
+        memberRecord,
+      }).rpc();
+      setDisputeConfirm(false);
+      await loadPool();
+    } catch (e: unknown) {
+      setDisputeError(e instanceof Error ? e.message : "Transaction failed");
+    } finally {
+      setFlaggingDispute(false);
     }
   }
 
@@ -336,6 +431,8 @@ export default function PoolDetailPage() {
   const isFull     = pool.filledSlots >= pool.maxSlots;
   const priceNum   = pool.pricePerSlot.toNumber() / 1_000_000; // lamports → USDC
   const hasEnoughUsdc = usdcBalance !== null ? usdcBalance >= priceNum : true;
+
+  const isMember = members.some((m) => m.wallet.toBase58() === publicKey?.toBase58());
 
   const tabs = ["Members", "Activity", "Reviews", "Terms"];
 
@@ -777,25 +874,94 @@ export default function PoolDetailPage() {
                     {waitlistJoined ? "✓ ON WAITLIST" : "JOIN WAITLIST →"}
                   </button>
                 ) : (
-                  <button
-                    onClick={() => setJoinStep("confirm")}
-                    style={{
-                      width: "100%",
-                      background: "var(--b-paper)",
-                      color: "var(--b-ink)",
-                      border: "none",
-                      padding: "14px 24px",
-                      fontFamily: "var(--font-geist-mono), monospace",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      letterSpacing: "0.16em",
-                      textTransform: "uppercase",
-                      cursor: "pointer",
-                      transition: "opacity 0.15s",
-                    }}
-                  >
-                    REVIEW &amp; LOCK MY SEAT →
-                  </button>
+                  <>
+                    {/* ToS checkbox */}
+                    <label
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 10,
+                        marginBottom: 14,
+                        cursor: "pointer",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={tosAccepted}
+                        onChange={(e) => setTosAccepted(e.target.checked)}
+                        style={{
+                          marginTop: 2,
+                          accentColor: "var(--b-gold)",
+                          width: 14,
+                          height: 14,
+                          flexShrink: 0,
+                          cursor: "pointer",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-geist-mono), monospace",
+                          fontSize: 10.5,
+                          color: "var(--b-paper-60)",
+                          lineHeight: 1.6,
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        I agree to the{" "}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.preventDefault(); setActiveTab("Terms"); }}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            padding: 0,
+                            fontFamily: "var(--font-geist-mono), monospace",
+                            fontSize: 10.5,
+                            color: "var(--b-gold)",
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                            letterSpacing: "0.04em",
+                          }}
+                        >
+                          Pool Terms
+                        </button>
+                        {" "}and{" "}
+                        <Link
+                          href="/legal/terms"
+                          target="_blank"
+                          style={{
+                            color: "var(--b-gold)",
+                            textDecoration: "underline",
+                            fontFamily: "var(--font-geist-mono), monospace",
+                            fontSize: 10.5,
+                          }}
+                        >
+                          Poolly Terms of Service
+                        </Link>
+                      </span>
+                    </label>
+                    <button
+                      onClick={() => setJoinStep("confirm")}
+                      disabled={!tosAccepted}
+                      style={{
+                        width: "100%",
+                        background: "var(--b-paper)",
+                        color: "var(--b-ink)",
+                        border: "none",
+                        padding: "14px 24px",
+                        fontFamily: "var(--font-geist-mono), monospace",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        cursor: tosAccepted ? "pointer" : "not-allowed",
+                        transition: "opacity 0.15s",
+                        opacity: tosAccepted ? 1 : 0.45,
+                      }}
+                    >
+                      REVIEW &amp; LOCK MY SEAT →
+                    </button>
+                  </>
                 )}
                 <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 9.5, color: "var(--b-paper-40)", textAlign: "center", marginTop: 10, letterSpacing: "0.12em", textTransform: "uppercase" }}>
                   {isFull ? "POOL FULL · NOTIFY ME WHEN A SEAT OPENS" : "FUNDS HELD IN ESCROW · RELEASED ONLY ON DELIVERY"}
@@ -807,6 +973,212 @@ export default function PoolDetailPage() {
           {closed && !isHost && (
             <div style={{ border: "1px solid var(--b-rule)", padding: "20px 24px", textAlign: "center" }}>
               <p className="b-eyebrow">THIS PLAN IS CLOSED</p>
+            </div>
+          )}
+
+          {/* ── B. CLAIM REFUND (member, closed pool) ── */}
+          {closed && isMember && wallet && (
+            <div
+              style={{
+                border: "1px solid rgba(201,162,79,0.45)",
+                background: "rgba(201,162,79,0.04)",
+                padding: "20px 24px",
+              }}
+            >
+              <p className="b-eyebrow" style={{ marginBottom: 12 }}>REFUND AVAILABLE</p>
+              {claimError && (
+                <div style={{ padding: "10px 14px", border: "1px solid rgba(181,86,62,0.4)", background: "rgba(181,86,62,0.08)", fontSize: 12, color: "var(--b-rust)", marginBottom: 12 }}>
+                  {claimError}
+                </div>
+              )}
+              <button
+                onClick={claimRefund}
+                disabled={claimingRefund || !wallet}
+                style={{
+                  width: "100%",
+                  background: "rgba(201,162,79,0.1)",
+                  border: "1px solid rgba(201,162,79,0.5)",
+                  color: "var(--b-gold)",
+                  padding: "12px 20px",
+                  fontFamily: "var(--font-geist-mono), monospace",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  cursor: (claimingRefund || !wallet) ? "not-allowed" : "pointer",
+                  opacity: (claimingRefund || !wallet) ? 0.5 : 1,
+                }}
+              >
+                {claimingRefund ? "CLAIMING…" : `CLAIM REFUND → ${formatUsdc(pool.pricePerSlot)}`}
+              </button>
+            </div>
+          )}
+
+          {/* ── A. LEAVE POOL (non-host member, open pool) ── */}
+          {open && !isHost && isMember && wallet && (
+            <div
+              style={{
+                border: "1px solid rgba(181,86,62,0.3)",
+                background: "rgba(181,86,62,0.04)",
+                padding: "16px 20px",
+              }}
+            >
+              {leaveError && (
+                <div style={{ padding: "10px 14px", border: "1px solid rgba(181,86,62,0.4)", background: "rgba(181,86,62,0.08)", fontSize: 12, color: "var(--b-rust)", marginBottom: 10 }}>
+                  {leaveError}
+                </div>
+              )}
+              {!leaveConfirm ? (
+                <button
+                  onClick={() => setLeaveConfirm(true)}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid rgba(181,86,62,0.35)",
+                    color: "var(--b-rust)",
+                    padding: "9px 18px",
+                    fontFamily: "var(--font-geist-mono), monospace",
+                    fontSize: 10.5,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    cursor: "pointer",
+                  }}
+                >
+                  LEAVE POOL
+                </button>
+              ) : leavingPool ? (
+                <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10.5, color: "var(--b-rust)", letterSpacing: "0.12em" }}>
+                  LEAVING…
+                </p>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10.5, color: "var(--b-paper-40)", letterSpacing: "0.08em" }}>
+                    Left pool. Your USDC refund has been sent.
+                  </p>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      onClick={leavePool}
+                      style={{
+                        background: "rgba(181,86,62,0.12)",
+                        border: "1px solid rgba(181,86,62,0.4)",
+                        color: "var(--b-rust)",
+                        padding: "9px 18px",
+                        fontFamily: "var(--font-geist-mono), monospace",
+                        fontSize: 10.5,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        cursor: "pointer",
+                      }}
+                    >
+                      CONFIRM LEAVE
+                    </button>
+                    <button
+                      onClick={() => { setLeaveConfirm(false); setLeaveError(""); }}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid var(--b-rule)",
+                        color: "var(--b-paper-60)",
+                        padding: "9px 18px",
+                        fontFamily: "var(--font-geist-mono), monospace",
+                        fontSize: 10.5,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        cursor: "pointer",
+                      }}
+                    >
+                      CANCEL
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── C. DISPUTE (active pool, non-host member) ── */}
+          {active && !isHost && isMember && wallet && (
+            <div>
+              {pool.isDisputed ? (
+                <div
+                  style={{
+                    border: "1px solid rgba(201,162,79,0.5)",
+                    background: "rgba(201,162,79,0.07)",
+                    padding: "12px 18px",
+                  }}
+                >
+                  <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10.5, color: "var(--b-gold)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                    ⚠ UNDER DISPUTE · FUND RELEASE FROZEN · AWAITING ADMIN RESOLUTION
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  {disputeError && (
+                    <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-rust)", letterSpacing: "0.08em", marginBottom: 6 }}>
+                      {disputeError}
+                    </p>
+                  )}
+                  {!disputeConfirm ? (
+                    <button
+                      onClick={() => setDisputeConfirm(true)}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        padding: 0,
+                        fontFamily: "var(--font-geist-mono), monospace",
+                        fontSize: 10,
+                        color: "var(--b-paper-40)",
+                        cursor: "pointer",
+                        letterSpacing: "0.08em",
+                        textDecoration: "underline",
+                        textDecorationStyle: "dotted",
+                        textUnderlineOffset: 3,
+                      }}
+                    >
+                      ⚠ Flag a dispute
+                    </button>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 10, color: "var(--b-paper-40)", letterSpacing: "0.08em" }}>
+                        This will freeze fund releases until resolved by admin.
+                      </p>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          onClick={flagDispute}
+                          disabled={flaggingDispute}
+                          style={{
+                            background: "transparent",
+                            border: "1px solid rgba(201,162,79,0.35)",
+                            color: "var(--b-gold)",
+                            padding: "6px 14px",
+                            fontFamily: "var(--font-geist-mono), monospace",
+                            fontSize: 10,
+                            letterSpacing: "0.12em",
+                            textTransform: "uppercase",
+                            cursor: flaggingDispute ? "not-allowed" : "pointer",
+                            opacity: flaggingDispute ? 0.5 : 1,
+                          }}
+                        >
+                          {flaggingDispute ? "FLAGGING…" : "CONFIRM FLAG"}
+                        </button>
+                        <button
+                          onClick={() => { setDisputeConfirm(false); setDisputeError(""); }}
+                          style={{
+                            background: "transparent",
+                            border: "1px solid var(--b-rule)",
+                            color: "var(--b-paper-60)",
+                            padding: "6px 14px",
+                            fontFamily: "var(--font-geist-mono), monospace",
+                            fontSize: 10,
+                            letterSpacing: "0.10em",
+                            textTransform: "uppercase",
+                            cursor: "pointer",
+                          }}
+                        >
+                          CANCEL
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -918,7 +1290,7 @@ export default function PoolDetailPage() {
                     DANGER ZONE
                   </p>
                   <p style={{ fontSize: 12, color: "var(--b-paper-40)", marginBottom: 12, lineHeight: 1.5 }}>
-                    Closing the pool marks it as closed and returns any remaining escrow funds to your wallet.
+                    Marks this plan as closed. Any escrow balance stays frozen — members can claim their deposits back. Release funds first if you want your payout.
                   </p>
                   {!confirmClose ? (
                     <button
@@ -1304,7 +1676,9 @@ export default function PoolDetailPage() {
                   {hostShort}
                 </p>
                 <p style={{ fontFamily: "var(--font-geist-mono), monospace", fontSize: 9.5, color: "var(--b-paper-40)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                  HOST · ★ 4.9 · {pool.totalCycles} PLANS
+                  {pool.totalCycles === 0
+                    ? "HOST · NEW"
+                    : `HOST · ${pool.totalCycles} CYCLE${pool.totalCycles !== 1 ? "S" : ""} COMPLETED`}
                 </p>
               </div>
             </div>

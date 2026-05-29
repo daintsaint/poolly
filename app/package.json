@@ -29,6 +29,7 @@
         "openai": "^6.39.0",
         "react": "19.2.4",
         "react-dom": "19.2.4",
+        "resend": "^6.12.4",
         "shadcn": "^4.8.0"
     },
     "devDependencies": {
